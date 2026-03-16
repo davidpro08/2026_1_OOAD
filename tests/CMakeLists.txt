@@ -2,7 +2,10 @@
 add_executable(unit_tests test_main.cpp)
 
 # GTest 및 프로젝트 소스 연결
-target_link_libraries(unit_tests GTest::gtest GTest::gtest_main)
+target_link_libraries(unit_tests GTest::gtest GTest::gtest_main OOAD_Lib)
+
+# 헤더 경로 추가
+target_include_directories(unit_tests PRIVATE "../2026_1_OOAD")
 
 # C++20 표준 적용
 set_target_properties(unit_tests PROPERTIES CXX_STANDARD 20)

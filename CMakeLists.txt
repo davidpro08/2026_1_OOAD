@@ -20,5 +20,14 @@ else()
     message(WARNING "Cppcheck not found.")
 endif()
 
+# Clang-Tidy 설정
+find_program(CLANG_TIDY_PATH NAMES clang-tidy)
+if(CLANG_TIDY_PATH)
+    set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY_PATH} -extra-arg=-std=c++20)
+    message(STATUS "Clang-Tidy found: ${CLANG_TIDY_PATH}")
+else()
+    message(WARNING "Clang-Tidy not found.")
+endif()
+
 # 하위 프로젝트를 포함합니다.
 add_subdirectory ("2026_1_OOAD")

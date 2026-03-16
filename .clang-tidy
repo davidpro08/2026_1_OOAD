@@ -1,0 +1,6 @@
+---
+Checks:          'clang-diagnostic-*,clang-analyzer-*,google-*,modernize-*,performance-*,readability-*'
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*'
+FormatStyle:     google
+...

@@ -11,5 +11,14 @@ endif()
 
 project ("2026_1_OOAD")
 
+# Cppcheck 설정
+find_program(CPPCHECK_PATH NAMES cppcheck)
+if(CPPCHECK_PATH)
+    set(CMAKE_CXX_CPPCHECK ${CPPCHECK_PATH} --enable=all --suppress=missingIncludeSystem --inconclusive --check-level=exhaustive)
+    message(STATUS "Cppcheck found: ${CPPCHECK_PATH}")
+else()
+    message(WARNING "Cppcheck not found.")
+endif()
+
 # 하위 프로젝트를 포함합니다.
 add_subdirectory ("2026_1_OOAD")

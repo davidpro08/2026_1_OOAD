@@ -29,5 +29,24 @@ else()
     message(WARNING "Clang-Tidy not found.")
 endif()
 
+# 테스트 활성화
+enable_testing()
+
+# FetchContent를 사용한 Google Test 설정
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        v1.15.2
+)
+# MSVC 관련 경고 방지 (컴파일러 호환성)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
 # 하위 프로젝트를 포함합니다.
 add_subdirectory ("2026_1_OOAD")
+
+# 테스트 디렉토리 추가
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+    add_subdirectory("tests")
+endif()

@@ -3,11 +3,9 @@ name: CalVer Release
 on:
   push:
     branches:
-      - master, chore/deploy-automation
-
-permissions:
-  contents: write
-
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
 jobs:
   release:
     runs-on: ubuntu-latest

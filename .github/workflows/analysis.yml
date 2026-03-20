@@ -1,0 +1,36 @@
+name: C++ Static Analysis and Testing
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake cppcheck clang-tidy libgtest-dev
+
+    - name: Configure CMake
+      # CMake 구성 단계에서 Cppcheck와 Clang-Tidy가 활성화됩니다.
+      run: |
+        cmake -S . -B build \
+          -DCMAKE_CXX_CPPCHECK="cppcheck;--enable=all;--inconclusive" \
+          -DCMAKE_CXX_CLANG_TIDY="clang-tidy;-header-filter=.*"
+
+    - name: Build Project
+      # 빌드 과정에서 Cppcheck와 Clang-Tidy 분석이 함께 수행됩니다.
+      run: cmake --build build
+
+    - name: Run Google Test
+      # 빌드된 테스트 실행 파일을 실행합니다.
+      run: |
+        cd build
+        ctest --output-on-failure

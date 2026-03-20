@@ -29,14 +29,13 @@ else()
 endif()
 
 # Clang-Tidy 설정
-# Clang-Tidy 설정
 find_program(CLANG_TIDY_PATH NAMES clang-tidy)
 if(CLANG_TIDY_PATH)
     set(CMAKE_CXX_CLANG_TIDY 
         ${CLANG_TIDY_PATH} 
+        "-checks=clang-diagnostic-*,clang-analyzer-*,google-*,modernize-*,performance-*,readability-*" # 검사 항목 추가
         "-header-filter=${CMAKE_SOURCE_DIR}/.*"
         "-system-headers=0"
-        # 핵심: Clang-Tidy가 -ZI 같은 MSVC 옵션을 에러로 처리하지 않게 합니다.
         "--extra-arg-before=--driver-mode=cl"
         "--extra-arg=-Qunused-arguments"
     )

@@ -13,19 +13,31 @@
 #if !defined(_EVENTBUS_H)
 #define _EVENTBUS_H
 
+#include <vector>
+#include <functional>
+#include "SensorController.h"
 
 class EventBus {
 public:
-	void moveForward();
+	using moveForwardCallBack = std::function<void()>;
+	using avoidObstacleCallBack = std::function<void(SensorController* sender)>;
+	using detectDustCallBack = std::function<void()>;
+	using turnOffCallBack = std::function<void()>;
+
+	void publishMoveForward();
 	void subScribeMoveForward(moveForwardCallBack cb);
-	void avoidObstacle(SensorController* sender);
+	void publishAvoidObstacle(SensorController* sender);
 	void subScribeAvoidObstacle(avoidObstacleCallBack cb);
-	void HandleDust();
+	void publishDetectedDust();
 	void subScribeDetectedDust(detectDustCallBack cb);
+	void publishTurnOff();
+	void subScribeTurnOff(turnOffCallBack cb);
+
 private:
-	vector<moveForwardCallBack> moveForwardSubs;
-	vector<avoidObstacleCallBack> avoidObstacleSubs;
-	vector<detectDustCallBack> detectDustSubs;
+	std::vector<moveForwardCallBack> moveForwardSubs;
+	std::vector<avoidObstacleCallBack> avoidObstacleSubs;
+	std::vector<detectDustCallBack> detectedDustSubs;
+	std::vector<turnOffCallBack> turnOffSubs;
 };
 
 #endif  //_EVENTBUS_H

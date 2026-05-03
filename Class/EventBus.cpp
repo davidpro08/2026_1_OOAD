@@ -12,27 +12,36 @@
 
 #include "EventBus.h"
 
-void EventBus::moveForward() {
-
+void EventBus::publishMoveForward() {
+    for (auto& cb : moveForwardSubs) cb();
 }
 
 void EventBus::subScribeMoveForward(moveForwardCallBack cb) {
-
+    moveForwardSubs.push_back(cb);
 }
 
-void EventBus::avoidObstacle(SensorController* sender) {
-
+void EventBus::publishAvoidObstacle(SensorController* sender) {
+    for (auto& cb : avoidObstacleSubs) cb(sender);
 }
 
 void EventBus::subScribeAvoidObstacle(avoidObstacleCallBack cb) {
-
+    avoidObstacleSubs.push_back(cb);
 }
 
-void EventBus::HandleDust() {
-
+void EventBus::publishDetectedDust() {
+    for (auto& cb : detectedDustSubs) cb();
 }
 
 void EventBus::subScribeDetectedDust(detectDustCallBack cb) {
-
+    detectedDustSubs.push_back(cb);
 }
 
+void EventBus::publishTurnOff()
+{
+    for (auto& cb : turnOffSubs) cb();
+}
+
+void EventBus::subScribeTurnOff(turnOffCallBack cb)
+{
+    turnOffSubs.push_back(cb);
+}

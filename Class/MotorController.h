@@ -21,17 +21,17 @@ class MotorController : public IPower {
 public:
 	MotorController(EventBus* bus);
 	void turnOn();
-	void turnOff();
-	void AvoidObstacle();
+	void turnOff() override;
+	void AvoidObstacle(SensorProvider provider);
 	void MCStop();
 private:
 	EventBus* bus;
 	SensorProvider mySensor;
 	bool isTurnOn;
-	void MCmoveForward();
-	void MCmoveLeft();
-	void MCmoveRight();
-	void MCmoveBackward();
+	void MCMoveForward();
+	void MCTurnLeft();
+	void MCTurnRight();
+	void MCMoveBackward();
 };
 
 #endif  //_MOTORCONTROLLER_H

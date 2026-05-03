@@ -14,14 +14,20 @@
 #define _TICK_H
 
 #include <thread>
+#include "SensorController.h"
+#include "EventBus.h"
 
 class Tick {
 public:
+	Tick(EventBus* bus, SensorController* sensor);
 	bool doCheck;
 	void DoDustCheck();
 	void StopDustCheck();
+
 private:
 	std::thread worker;
+	SensorController* sensor;
+	void Check();
 };
 
 #endif  //_TICK_H

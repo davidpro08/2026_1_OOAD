@@ -9,34 +9,42 @@
 //
 //
 
+const int DUST_THRESHOLD = 5;
 
 #include "SensorController.h"
 
-SensorController::SensorController(int EventBus* bus) {
+SensorController::SensorController(EventBus* bus) {
+    this->bus = bus;
+    isTurnOn = false;
 
 }
 
 void SensorController::turnOn() {
-
+    isTurnOn = true;
 }
 
 void SensorController::turnOff() {
-
+    isTurnOn = false;
 }
 
 void SensorController::FrontObstacleDetected() {
-
+    bus->publishAvoidObstacle(this);
 }
 
 bool SensorController::getLeftState() {
-
+    // return LeftSensor.detect()
 }
 
 bool SensorController::getRightState() {
-
+    // return RightSensor.detect()
 }
 
 void SensorController::ChecknPowerUp() {
+    // DustSensor에게 Detect 수행하고 Result 받아옴
+    int dust = 5; // TODO: dustSensor.detect()
 
+    if(dust >= DUST_THRESHOLD ){
+        bus->publishDetectedDust();
+    }
 }
 

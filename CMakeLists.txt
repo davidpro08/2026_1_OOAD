@@ -1,7 +1,7 @@
 ﻿# CMakeList.txt : 최상위 CMake 프로젝트 파일, 전역 구성을 수행하고
 # 여기에 하위 프로젝트를 포함합니다.
 #
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.15...3.27)
 
 # 지원되는 경우 MSVC 컴파일러에 대해 핫 다시 로드 사용하도록 설정합니다.
 if (POLICY CMP0141)
@@ -58,6 +58,7 @@ FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
   GIT_TAG        v1.15.2
+  SYSTEM
 )
 # MSVC 관련 경고 방지 (컴파일러 호환성)
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -65,6 +66,13 @@ FetchContent_MakeAvailable(googletest)
 
 # 하위 프로젝트를 포함합니다.
 add_subdirectory ("2026_1_OOAD")
+
+if(TARGET gtest)
+    set_target_properties(gtest gtest_main gmock gmock_main PROPERTIES
+        CXX_CPPCHECK ""
+        CXX_CLANG_TIDY ""
+    )
+endif()
 
 # 테스트 디렉토리 추가
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")

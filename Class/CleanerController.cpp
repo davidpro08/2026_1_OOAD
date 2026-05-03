@@ -12,7 +12,7 @@
 
 #include "CleanerController.h"
 #include "Timer.h"
-const int PowerUpDuration = 5000;
+const int PowerUpDuration = 5; // 파워업 지속 시간 (초)
 
 CleanerController::CleanerController(EventBus* bus) {
     bus->subScribeMoveForward([this]() {

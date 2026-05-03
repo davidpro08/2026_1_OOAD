@@ -13,13 +13,18 @@
 #define _TIMER_H
 
 #include <thread>
+#include <functional>
+#include <atomic>
 
 class Timer {
 public:
-	void setTimer();
+	using ReturnCallback = std::function<void()>;
+
+	void setTimer(int time, ReturnCallback returnCallback );
+	void doTimer(ReturnCallback returnCallback);
 private:
 	std::thread worker;
-	float current_Time;
+	std::atomic<int> current_Time;
 };
 
 #endif  //_TIMER_H

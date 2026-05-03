@@ -9,7 +9,7 @@
 //
 //
 
-#define DUST_THRESHOLD 5;
+const int DUST_THRESHOLD = 5;
 
 #include "SensorController.h"
 

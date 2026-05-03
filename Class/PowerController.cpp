@@ -12,11 +12,19 @@
 
 #include "PowerController.h"
 
-void PowerController::turnOn() {
+PowerController::PowerController(EventBus *bus)
+{
+    this->bus = bus;
+}
 
+void PowerController::turnOn()
+{
+    power = true;
+    bus->publishMoveForward();
 }
 
 void PowerController::turnOff() {
-
+    power = false;
+    bus->publishTurnOff();
 }
 

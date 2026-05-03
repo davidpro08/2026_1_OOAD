@@ -12,11 +12,45 @@
 
 #include "Tick.h"
 
-void Tick::DoDustCheck() {
+Tick::Tick(EventBus *bus, SensorController *sensor)
+{
+    bus->subScribeMoveForward([this]() {
+            this->DoDustCheck();
+        });
 
+    this->sensor = sensor;
+}
+
+Tick::~Tick()
+{
+    StopDustCheck();
+}
+
+void Tick::DoDustCheck()
+{
+    if(doCheck) return;
+
+    doCheck = true;
+    if(!worker.joinable()){
+        worker = std::thread(&Tick::Check, this);
+    }
+}
+
+void Tick::Check()
+{
+    while(1){
+        if(doCheck == false) break;
+        if(sensor){
+            sensor->ChecknPowerUp();
+        }
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
 }
 
 void Tick::StopDustCheck() {
-
+    doCheck = false;
+    if(worker.joinable()){
+        worker.join();
+    }
 }
-

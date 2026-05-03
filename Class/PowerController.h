@@ -9,17 +9,19 @@
 //
 //
 
+#include "EventBus.h"
 
 #if !defined(_POWERCONTROLLER_H)
 #define _POWERCONTROLLER_H
 
-
 class PowerController {
 public:
+	PowerController(EventBus* bus);
 	void turnOn();
 	void turnOff();
 private:
 	bool power;
+	EventBus* bus;
 };
 
 #endif  //_POWERCONTROLLER_H

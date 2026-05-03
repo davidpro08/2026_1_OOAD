@@ -9,16 +9,16 @@
 //
 //
 
-
 #if !defined(_TIMER_H)
 #define _TIMER_H
 
+#include <thread>
 
 class Timer {
 public:
 	void setTimer();
 private:
-	Thread worker;
+	std::thread worker;
 	float current_Time;
 };
 

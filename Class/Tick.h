@@ -13,6 +13,7 @@
 #if !defined(_TICK_H)
 #define _TICK_H
 
+#include <thread>
 
 class Tick {
 public:
@@ -20,7 +21,7 @@ public:
 	void DoDustCheck();
 	void StopDustCheck();
 private:
-	thread worker;
+	std::thread worker;
 };
 
 #endif  //_TICK_H

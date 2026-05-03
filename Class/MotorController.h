@@ -15,10 +15,11 @@
 
 #include "IPower.h"
 #include "SensorProvider.h"
+#include "EventBus.h"
 
 class MotorController : public IPower {
 public:
-	MotorController(int EventBus* bus);
+	MotorController(EventBus* bus);
 	void turnOn();
 	void turnOff();
 	void AvoidObstacle();

@@ -15,10 +15,11 @@
 
 #include "SensorProvider.h"
 #include "IPower.h"
+#include "EventBus.h"
 
 class SensorController : public SensorProvider, public IPower {
 public:
-	SensorController(int EventBus* bus);
+	SensorController(EventBus* bus);
 	void turnOn();
 	void turnOff();
 	void FrontObstacleDetected();

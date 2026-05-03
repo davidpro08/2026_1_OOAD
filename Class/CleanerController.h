@@ -14,10 +14,11 @@
 #define _CLEANERCONTROLLER_H
 
 #include "IPower.h"
+#include "EventBus.h"
 
 class CleanerController : public IPower {
 public:
-	CleanerController(int EventBus* bus);
+	CleanerController(EventBus* bus);
 	void turnOn();
 	void turnOff();
 	void CCpowerUp();

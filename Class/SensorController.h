@@ -21,14 +21,15 @@ class SensorController : public SensorProvider, public IPower {
 public:
 	SensorController(EventBus* bus);
 	void turnOn();
-	void turnOff();
+	void turnOff() override;
 	void FrontObstacleDetected();
 	bool getLeftState();
 	bool getRightState();
+	void ChecknPowerUp();
+
 private:
 	EventBus* bus;
 	bool isTurnOn;
-	void ChecknPowerUp();
 };
 
 #endif  //_SENSORCONTROLLER_H

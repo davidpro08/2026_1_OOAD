@@ -11,24 +11,32 @@
 
 
 #include "CleanerController.h"
+#include "Timer.h"
+#define PowerUpDuration 5000
 
-CleanerController::CleanerController(int EventBus* bus) {
-
+CleanerController::CleanerController(EventBus* bus) {
+    bus->subScribeMoveForward([this]() {
+            this->CCpowerUp();
+        });
+    Timer timer;
 }
 
 void CleanerController::turnOn() {
-
+    isTurnOn = true;
 }
 
 void CleanerController::turnOff() {
-
+    isTurnOn = false;
 }
 
 void CleanerController::CCpowerUp() {
-
+    //청소기 강하게
+    timer.setTimer(PowerUpDuration, [this]() {
+            this->CCpowerRestore();
+        });
 }
 
 void CleanerController::CCpowerRestore() {
-
+    //청소기 원래대로
 }
 

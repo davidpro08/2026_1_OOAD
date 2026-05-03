@@ -15,17 +15,19 @@
 
 #include "IPower.h"
 #include "EventBus.h"
+#include "Timer.h"
 
 class CleanerController : public IPower {
 public:
 	CleanerController(EventBus* bus);
 	void turnOn();
-	void turnOff();
+	void turnOff() override;
 	void CCpowerUp();
 	void CCpowerRestore();
 private:
 	bool isTurnOn;
 	bool powerUp;
+	Timer timer;
 };
 
 #endif  //_CLEANERCONTROLLER_H

@@ -21,7 +21,9 @@ add_library(OOAD_Lib STATIC
     "Class/Tick.cpp"
     "Class/Tick.h"
     "Class/IPower.h"
+    "Class/IPower.cpp"
     "Class/SensorProvider.h"
+    "Class/SensorProvider.cpp"
 )
 
 target_include_directories(OOAD_Lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

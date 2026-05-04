@@ -16,7 +16,7 @@
 void Timer::setTimer(int time, ReturnCallback returnCallback) {
     current_Time = time * 1000; // 초를 밀리초로 변환
     if(!worker.joinable()){ //worker 가 살아있다면 갱신
-        worker = std::thread(doTimer, this, returnCallback);
+        worker = std::thread(&Timer::doTimer, this, returnCallback);
     }
 }
 

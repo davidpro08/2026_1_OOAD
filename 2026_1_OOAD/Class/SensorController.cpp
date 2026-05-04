@@ -33,10 +33,12 @@ void SensorController::FrontObstacleDetected() {
 
 bool SensorController::getLeftState() {
     // return LeftSensor.detect()
+    return false;
 }
 
 bool SensorController::getRightState() {
     // return RightSensor.detect()
+    return false;
 }
 
 void SensorController::ChecknPowerUp() {

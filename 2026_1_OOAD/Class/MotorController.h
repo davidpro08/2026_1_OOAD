@@ -22,7 +22,7 @@ public:
 	MotorController(EventBus* bus);
 	void turnOn();
 	void turnOff() override;
-	void AvoidObstacle(SensorProvider provider);
+	void AvoidObstacle(SensorProvider& provider);
 	void MCStop();
 private:
 	EventBus* bus;

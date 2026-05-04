@@ -19,26 +19,17 @@ project ("2026_1_OOAD")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Cppcheck 설정
+# Cppcheck / Clang-Tidy: 전역(CMAKE_CXX_*)에 두면 FetchContent(googletest)까지 검사되어 빌드가 실패합니다.
+# 경로만 찾아 두고, 실제 적용은 2026_1_OOAD/CMakeLists.txt에서 OOAD_Lib·실행 파일 타겟에만 합니다.
 find_program(CPPCHECK_PATH NAMES cppcheck)
 if(CPPCHECK_PATH)
-    set(CMAKE_CXX_CPPCHECK ${CPPCHECK_PATH} --enable=all --suppress=missingIncludeSystem --inconclusive --check-level=exhaustive)
     message(STATUS "Cppcheck found: ${CPPCHECK_PATH}")
 else()
     message(WARNING "Cppcheck not found.")
 endif()
 
-# Clang-Tidy 설정
 find_program(CLANG_TIDY_PATH NAMES clang-tidy)
 if(CLANG_TIDY_PATH)
-    set(CMAKE_CXX_CLANG_TIDY 
-        ${CLANG_TIDY_PATH} 
-        "-checks=clang-diagnostic-*,clang-analyzer-*,google-*,modernize-*,performance-*,readability-*" # 검사 항목 추가
-        "-header-filter=${CMAKE_SOURCE_DIR}/.*"
-        "-system-headers=0"
-        "--extra-arg-before=--driver-mode=cl"
-        "--extra-arg=-Qunused-arguments"
-    )
     message(STATUS "Clang-Tidy found: ${CLANG_TIDY_PATH}")
 else()
     message(WARNING "Clang-Tidy not found.")

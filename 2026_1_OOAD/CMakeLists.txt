@@ -35,4 +35,19 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_target_properties(2026_1_OOAD PROPERTIES CXX_STANDARD 20)
 endif()
 
-# TODO: 필요한 경우 테스트를 추가하고 대상을 설치합니다.
+if(CPPCHECK_PATH)
+  set(_ooad_cppcheck "${CPPCHECK_PATH};--enable=all;--suppress=missingIncludeSystem;--inconclusive;--check-level=exhaustive")
+  set_target_properties(OOAD_Lib 2026_1_OOAD PROPERTIES CXX_CPPCHECK "${_ooad_cppcheck}")
+endif()
+
+if(CLANG_TIDY_PATH)
+  set(_ooad_tidy
+    "${CLANG_TIDY_PATH}"
+    "-checks=clang-diagnostic-*,clang-analyzer-*,google-*,modernize-*,performance-*,readability-*"
+    "-header-filter=${CMAKE_SOURCE_DIR}/(2026_1_OOAD|tests)/.*"
+    "-system-headers=0"
+    "--extra-arg-before=--driver-mode=cl"
+    "--extra-arg=-Qunused-arguments"
+  )
+  set_target_properties(OOAD_Lib 2026_1_OOAD PROPERTIES CXX_CLANG_TIDY "${_ooad_tidy}")
+endif()

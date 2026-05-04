@@ -15,7 +15,8 @@
 
 #include <vector>
 #include <functional>
-#include "SensorController.h"
+
+class SensorController;
 
 class EventBus {
 public:

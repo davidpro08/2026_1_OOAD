@@ -20,6 +20,7 @@
 class Tick {
 public:
 	Tick(EventBus* bus, SensorController* sensor);
+	~Tick();
 	bool doCheck;
 	void DoDustCheck();
 	void StopDustCheck();

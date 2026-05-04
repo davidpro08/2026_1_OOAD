@@ -3,7 +3,7 @@
 #
 
 # 소스 파일들을 포함하는 라이브러리 생성 (테스트에서도 참조 가능하도록 함)
-add_library(OOAD_Lib STATIC 
+add_library(OOAD_Lib STATIC
     "2026_1_OOAD.cpp"
     "2026_1_OOAD.h"
     "Class/EventBus.cpp"
@@ -23,6 +23,8 @@ add_library(OOAD_Lib STATIC
     "Class/IPower.h"
     "Class/SensorProvider.h"
 )
+
+target_include_directories(OOAD_Lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # 이 프로젝트의 실행 파일 생성
 add_executable(2026_1_OOAD main.cpp) 

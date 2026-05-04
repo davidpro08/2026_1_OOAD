@@ -11,6 +11,7 @@
 
 
 #include "MotorController.h"
+#include "SensorController.h"
 
 MotorController::MotorController(EventBus* bus) {
     this->bus = bus;
@@ -20,8 +21,7 @@ MotorController::MotorController(EventBus* bus) {
         this->MCMoveForward();
     });
     bus->subScribeAvoidObstacle([this](SensorController* sensor) {
-        SensorProvider mySensor = *sensor;
-        this->AvoidObstacle((SensorProvider)mySensor); 
+        this->AvoidObstacle(*sensor);
     });
 }
 
@@ -33,7 +33,7 @@ void MotorController::turnOff() {
     isTurnOn = false;
 }
 
-void MotorController::AvoidObstacle(SensorProvider provider) {
+void MotorController::AvoidObstacle(SensorProvider& provider) {
     // 모터 멈춤
     MCStop();
 

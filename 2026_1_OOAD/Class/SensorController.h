@@ -26,6 +26,7 @@ public:
 	bool getLeftState();
 	bool getRightState();
 	void ChecknPowerUp();
+	bool getIsTurnOn(); 
 
 private:
 	EventBus* bus;

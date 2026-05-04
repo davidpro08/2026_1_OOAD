@@ -50,3 +50,7 @@ void SensorController::ChecknPowerUp() {
     }
 }
 
+bool SensorController::getIsTurnOn() {
+    return isTurnOn;
+}
+

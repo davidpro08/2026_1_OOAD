@@ -16,6 +16,16 @@ public:
     bool getRightState() override { return right; }
 };
 
+class FakeSensor : public ISensor {
+public:
+    bool detect() override {
+        return true; // 항상 감지된다고 가정
+    }
+    bool detect(bool value) {
+        return value; 
+    }
+};
+
 }  // namespace
 
 TEST(MotorController, TurnOnTurnOffDoesNotThrow) {
@@ -83,8 +93,12 @@ TEST(MotorController, AvoidObstacleViaEventBusUsesSensorControllerState) {
     MotorController motor(&bus);
     int move_forward_count = 0;
     bus.subScribeMoveForward([&move_forward_count] { ++move_forward_count; });
+    FakeSensor frontSensor;
+    FakeSensor leftSensor;
+    FakeSensor rightSensor;
+    FakeSensor dustSensor;
 
-    SensorController sensor(&bus);
+    SensorController sensor(&bus,&frontSensor,&leftSensor,&rightSensor,&dustSensor);
     bus.publishAvoidObstacle(&sensor);
 
     EXPECT_EQ(move_forward_count, 1);

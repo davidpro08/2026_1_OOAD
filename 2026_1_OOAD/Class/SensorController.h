@@ -16,10 +16,11 @@
 #include "SensorProvider.h"
 #include "IPower.h"
 #include "EventBus.h"
+#include "IsenSor.h"
 
 class SensorController : public SensorProvider, public IPower {
 public:
-	SensorController(EventBus* bus);
+	SensorController(EventBus* bus, ISensor* frontSensor, ISensor* leftSensor, ISensor* rightSensor, ISensor* dustSensor);
 	void turnOn();
 	void turnOff() override;
 	void FrontObstacleDetected();
@@ -31,6 +32,10 @@ public:
 private:
 	EventBus* bus;
 	bool isTurnOn;
+	ISensor* frontSensor;
+	ISensor* leftSensor;
+	ISensor* rightSensor;
+	ISensor* dustSensor;
 };
 
 #endif  //_SENSORCONTROLLER_H

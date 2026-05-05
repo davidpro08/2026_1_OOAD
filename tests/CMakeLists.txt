@@ -8,7 +8,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-add_executable(unit_tests test_main.cpp test_motor_controller.cpp)
+file(GLOB TEST_SRCS "*.cpp")
+add_executable(unit_tests ${TEST_SRCS})
+
+if(MSVC)
+    target_link_options(unit_tests PRIVATE /DEBUG)
+endif()
+
 target_link_libraries(unit_tests PRIVATE OOAD_Lib GTest::gtest_main)
 
 include(GoogleTest)

@@ -14,6 +14,8 @@ add_library(OOAD_Lib STATIC
     "Class/PowerController.h"
     "Class/SensorController.cpp"
     "Class/SensorController.h"
+    "Class/Motor.cpp"
+    "Class/Motor.h"
     "Class/MotorController.cpp"
     "Class/MotorController.h"
     "Class/Timer.cpp"

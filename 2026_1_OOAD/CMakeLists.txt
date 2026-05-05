@@ -3,28 +3,20 @@
 #
 
 # 소스 파일들을 포함하는 라이브러리 생성 (테스트에서도 참조 가능하도록 함)
-add_library(OOAD_Lib STATIC
+
+
+file(GLOB SRC_LIST 
     "2026_1_OOAD.cpp"
     "2026_1_OOAD.h"
-    "Class/EventBus.cpp"
-    "Class/EventBus.h"
-    "Class/CleanerController.cpp"
-    "Class/CleanerController.h"
-    "Class/PowerController.cpp"
-    "Class/PowerController.h"
-    "Class/SensorController.cpp"
-    "Class/SensorController.h"
-    "Class/MotorController.cpp"
-    "Class/MotorController.h"
-    "Class/Timer.cpp"
-    "Class/Timer.h"
-    "Class/Tick.cpp"
-    "Class/Tick.h"
-    "Class/IPower.h"
-    "Class/IPower.cpp"
-    "Class/SensorProvider.h"
-    "Class/SensorProvider.cpp"
-  "Class/HwCleaner.h")
+    "Class/*.cpp"
+    "Class/*.h"
+    "HDWARE/*.cpp"
+    "HDWARE/*.h"
+)
+
+add_library(OOAD_Lib STATIC
+    ${SRC_LIST}
+)
 
 target_include_directories(OOAD_Lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

@@ -13,21 +13,31 @@
 #include "Motor.h"
 
 void Motor::stop() {
-    // Motor.stop()
+
 }
 
 void Motor::moveForward() {
-    // Motor.moveForward()
+    point.x = point.x + direction.x;
+    point.y = point.y + direction.y;
+
 }
 
 void Motor::turnLeft() {
-    // Motor.turnLeft()
+    Point temp = direction;
+    direction.x = -temp.y;
+    direction.y = temp.x;
+
 }
 
 void Motor::turnRight() {
-    // Motor.turnRight()
-} 
+    Point temp = direction;
+    direction.x = temp.y;
+    direction.y = -temp.x;
+
+}
 
 void Motor::moveBackward() {
-    // Motor.moveBackward()
+    point.x = point.x - direction.x;
+    point.y = point.y - direction.y;
+
 }

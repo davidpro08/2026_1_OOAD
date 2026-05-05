@@ -13,15 +13,31 @@
 #if !defined(_MOTOR_H)
 #define _MOTOR_H
 
+class Point {
+public:
+    int x;
+    int y;
+
+    Point(int x, int y) : x(x), y(y) {}
+
+    bool isEqual(Point other) {
+        return this->x == other.x && this->y == other.y;
+    }
+};
+
 class Motor {
 public:
-	virtual ~Motor() = default;
+    virtual ~Motor() = default;
 
-	virtual void stop();
-	virtual void moveForward();
-	virtual void turnLeft();
-	virtual void turnRight();
-	virtual void moveBackward();
+    Point point = Point(0, 0);
+    // 초기 방향은 위쪽으로 가도록 설정
+    Point direction = Point(0, 1);
+
+    virtual void stop();
+    virtual void moveForward();
+    virtual void turnLeft();
+    virtual void turnRight();
+    virtual void moveBackward();
 };
 
 #endif  //_MOTOR_H

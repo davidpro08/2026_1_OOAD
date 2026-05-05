@@ -5,15 +5,25 @@
 #include "Class/CleanerController.h"
 #include "Class/Tick.h"
 
+
 #include <gtest/gtest.h>
 
-
-
+class FakeSensor : public ISensor {
+public:
+    bool value = true;
+    bool detect() override {
+        return value;
+    }
+};
 
 //Tick의 Subscribe확인
 TEST(TickTest, TickSubscribeCheck) {
     EventBus bus;
-    SensorController sensor(&bus);
+    FakeSensor frontSensor;
+    FakeSensor leftSensor;
+    FakeSensor rightSensor;
+    FakeSensor dustSensor;
+    SensorController sensor(&bus, &frontSensor, &leftSensor, &rightSensor, &dustSensor);
     Tick testTick(&bus, &sensor);
     SensorController* testSensor = NULL;
 
@@ -29,7 +39,11 @@ TEST(TickTest, TickSubscribeCheck) {
 //Tick의 DoDustCheck시 doCheck 변화 확인
 TEST(TickTest, WhenDoDustCheckChangeDoCheck) {
     EventBus bus;
-    SensorController sensor(&bus);
+    FakeSensor frontSensor;
+    FakeSensor leftSensor;
+    FakeSensor rightSensor;
+    FakeSensor dustSensor;
+    SensorController sensor(&bus, &frontSensor, &leftSensor, &rightSensor, &dustSensor);
     Tick testTick(&bus, &sensor);
 
     EXPECT_EQ(testTick.getDoCheck(), false);
@@ -40,7 +54,11 @@ TEST(TickTest, WhenDoDustCheckChangeDoCheck) {
 //Tick의 stopDustCheck시 doCheck 변화 확인
 TEST(TickTest, WhenStopDustCheckChangeDoCheck) {
     EventBus bus;
-    SensorController sensor(&bus);
+    FakeSensor frontSensor;
+    FakeSensor leftSensor;
+    FakeSensor rightSensor;
+    FakeSensor dustSensor;
+    SensorController sensor(&bus, &frontSensor, &leftSensor, &rightSensor, &dustSensor);
     Tick testTick(&bus, &sensor);
 
     EXPECT_EQ(testTick.getDoCheck(), false);

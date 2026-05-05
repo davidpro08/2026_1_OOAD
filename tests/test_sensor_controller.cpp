@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
-#include "SensorController.h"
+#include "Class/SensorController.h"
+#include "Class/ISensor.h"
+#include "Class/EventBus.h"
 
 
 

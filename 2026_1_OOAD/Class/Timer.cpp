@@ -35,10 +35,10 @@ void Timer::setTimer(int time, ReturnCallback returnCallback) {
 }
 
 void Timer::doTimer(ReturnCallback returnCallback){
-    const int interval = 100; // 100ms    
+    const int interval = 100; // 50ms    
     while (current_Time > 0) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(interval));
         current_Time -= interval;
+        std::this_thread::sleep_for(std::chrono::milliseconds(interval));
     }
     is_running = false;
 

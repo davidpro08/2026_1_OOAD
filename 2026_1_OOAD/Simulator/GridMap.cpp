@@ -19,6 +19,16 @@ void GridMap::resetDefault() {
     setWall(Point(4, 2));
     setWall(Point(4, 3));
     setWall(Point(4, 4));
+    setWall(Point(2, 2));
+    setWall(Point(2, 3));
+    setWall(Point(2, 4));
+    setWall(Point(2, 5));
+    setWall(Point(2, 6));
+    setWall(Point(2, 7));
+    setWall(Point(2, 8));
+    setWall(Point(2, 9));
+    setWall(Point(2, 10));
+    setWall(Point(3, 4));
     setWall(Point(7, 5));
     setWall(Point(8, 5));
     setWall(Point(3, 8));

@@ -1,4 +1,4 @@
-#include "Class/Isensor.h"
+#include "Class/ISensor.h"
 
 class RightSensor : public ISensor {
 private:

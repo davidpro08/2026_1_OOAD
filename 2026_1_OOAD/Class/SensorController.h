@@ -24,8 +24,8 @@ public:
 	void turnOn();
 	void turnOff() override;
 	void FrontObstacleDetected();
-	bool getLeftState();
-	bool getRightState();
+	bool getLeftState() override;
+	bool getRightState() override;
 	void ChecknPowerUp();
 	bool getIsTurnOn(); 
 

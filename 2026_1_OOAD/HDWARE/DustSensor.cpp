@@ -1,4 +1,4 @@
-#include "Class/Isensor.h"
+#include "Class/ISensor.h"
 
 class DustSensor : public ISensor {
 private:

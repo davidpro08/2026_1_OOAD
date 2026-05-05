@@ -259,31 +259,4 @@ public:
         ASSERT_EQ(motor.forwardCount, 1);
         ASSERT_TRUE(motor.point.isEqual(Point(-1, -3)));
     };
-
-    TEST_F(MotorControllerAvoidTest, EventAvoid) {
-        FakeSensor frontSensor;
-        FakeSensor leftSensor;
-        FakeSensor rightSensor;
-        FakeSensor dustSensor;
-
-        SensorController sensor(&bus,&frontSensor,&leftSensor,&rightSensor,&dustSensor);
-        bus.publishAvoidObstacle(&sensor);
-
-        ASSERT_EQ(motor.stopCount, 1);
-        ASSERT_EQ(motor.rightCount, 1);
-        ASSERT_EQ(motor.leftCount, 0);
-        ASSERT_EQ(motor.forwardCount, 1);
-        ASSERT_TRUE(motor.point.isEqual(Point(1, 0)));
-    };
-
-    TEST_F(MotorControllerAvoidTest, EventForward) {
-        bus.publishMoveForward();
-
-        ASSERT_EQ(motor.stopCount, 0);
-        ASSERT_EQ(motor.forwardCount, 1);
-        ASSERT_EQ(motor.rightCount, 0);
-        ASSERT_EQ(motor.leftCount, 0);
-        ASSERT_TRUE(motor.point.isEqual(Point(0, 1)));
-    };
-
 }

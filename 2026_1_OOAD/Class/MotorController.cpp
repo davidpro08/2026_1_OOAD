@@ -48,6 +48,7 @@ void MotorController::AvoidObstacle(SensorProvider& provider) {
         MCTurnLeft();
     }else{
         int retry_limit = 100; 
+        MCMoveBackward();
         while (provider.getLeftState() && provider.getRightState() && --retry_limit > 0) {
             MCMoveBackward();
         }

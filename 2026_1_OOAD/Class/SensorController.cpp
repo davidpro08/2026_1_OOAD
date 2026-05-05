@@ -12,11 +12,17 @@
 const int DUST_THRESHOLD = 5;
 
 #include "SensorController.h"
+#include "ISensor.h"
 
-SensorController::SensorController(EventBus* bus) {
+SensorController::SensorController(EventBus* bus, ISensor* frontSensor, ISensor* leftSensor, ISensor* rightSensor, ISensor* dustSensor) {
     this->bus = bus;
+    this->frontSensor = frontSensor;
+    this->leftSensor = leftSensor;
+    this->rightSensor = rightSensor;
+    this->dustSensor = dustSensor;
     isTurnOn = false;
-
+    // 센서를 배열로 받아야하나? 근데 그럼 기능별로 어떻게 구분하지? 일단은 그냥 개별적으로 해둠
+    //센서 임계점을 detect 함수에 인자로 넘겨서 판단하라 하거나 센서안에 상수 두거나 하면될듯
 }
 
 void SensorController::turnOn() {
@@ -32,21 +38,20 @@ void SensorController::FrontObstacleDetected() {
 }
 
 bool SensorController::getLeftState() {
-    // return LeftSensor.detect()
-    return false;
+    return leftSensor->detect();
 }
 
 bool SensorController::getRightState() {
-    // return RightSensor.detect()
-    return false;
+    return rightSensor->detect();
 }
 
 void SensorController::ChecknPowerUp() {
-    // DustSensor에게 Detect 수행하고 Result 받아옴
-    int dust = 5; // TODO: dustSensor.detect()
-
-    if(dust >= DUST_THRESHOLD ){
+    if(dustSensor->detect()){
         bus->publishDetectedDust();
     }
+}
+
+bool SensorController::getIsTurnOn() {
+    return isTurnOn;
 }
 

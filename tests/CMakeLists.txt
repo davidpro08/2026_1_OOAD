@@ -8,7 +8,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-add_executable(unit_tests test_main.cpp test_motor_controller.cpp)
+add_executable(unit_tests test_main.cpp test_motor_controller.cpp test_cleaner_controller.cpp test_timer.cpp "test_tick.cpp" "test_integration.cpp")
 target_link_libraries(unit_tests PRIVATE OOAD_Lib GTest::gtest_main)
 
 include(GoogleTest)

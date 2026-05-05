@@ -16,10 +16,13 @@
 #include "IPower.h"
 #include "EventBus.h"
 #include "Timer.h"
+#include "HwCleaner.h"
+#include "SensorController.h"
+#include <iostream>
 
 class CleanerController : public IPower {
 public:
-	CleanerController(EventBus* bus);
+	CleanerController(EventBus* bus, HwCleaner* cleaner);
 	void turnOn();
 	void turnOff() override;
 	void CCpowerUp();
@@ -27,6 +30,9 @@ public:
 private:
 	bool isTurnOn;
 	bool powerUp;
+	HwCleaner* cleaner;
+
+protected:
 	Timer timer;
 };
 

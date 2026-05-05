@@ -17,6 +17,9 @@ Tick::Tick(EventBus *bus, SensorController *sensor)
     bus->subScribeMoveForward([this]() {
             this->DoDustCheck();
         });
+    bus->subScribeAvoidObstacle([this](SensorController *sensor) {
+        this->StopDustCheck();
+        });
 
     this->sensor = sensor;
 }
@@ -28,7 +31,7 @@ Tick::~Tick()
 
 void Tick::DoDustCheck()
 {
-    if(doCheck) return;
+    if(doCheck == true) return;
 
     doCheck = true;
     if(!worker.joinable()){
@@ -53,4 +56,9 @@ void Tick::StopDustCheck() {
     if(worker.joinable()){
         worker.join();
     }
+}
+
+bool Tick::getDoCheck()
+{
+    return doCheck;
 }

@@ -12,31 +12,45 @@
 
 #include "CleanerController.h"
 #include "Timer.h"
+
 const int PowerUpDuration = 5; // 파워업 지속 시간 (초)
 
-CleanerController::CleanerController(EventBus* bus) {
+CleanerController::CleanerController(EventBus* bus, HwCleaner* cleaner) {
     bus->subScribeMoveForward([this]() {
-            this->CCpowerUp();
+            this->turnOn();
+        });
+    bus->subScribeDetectedDust([this]() {
+        this->CCpowerUp();
+        });
+    bus->subScribeAvoidObstacle([this](SensorController *sensor) {
+        this->turnOff();
+        });
+    bus->subScribeTurnOff([this]() {
+        this->turnOff();
         });
     Timer timer;
-}
+    isTurnOn = false;
+    powerUp = false;
+    this->cleaner = cleaner;
+}   
 
 void CleanerController::turnOn() {
     isTurnOn = true;
+    cleaner->turnOn();
 }
 
 void CleanerController::turnOff() {
     isTurnOn = false;
+    cleaner->turnOff();
 }
 
 void CleanerController::CCpowerUp() {
-    //청소기 강하게
+    cleaner->powerUp();
     timer.setTimer(PowerUpDuration, [this]() {
             this->CCpowerRestore();
         });
 }
 
 void CleanerController::CCpowerRestore() {
-    //청소기 원래대로
+    cleaner->powerRestore();
 }
-

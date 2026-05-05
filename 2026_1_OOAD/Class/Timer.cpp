@@ -12,10 +12,24 @@
 
 #include "Timer.h"
 
+Timer::Timer() {
+    current_Time = 0;
+}
+
+Timer::~Timer() {
+    if (worker.joinable()) {
+        current_Time = 0; // 쓰레드가 loop를 빨리 빠져나오게 유도
+        worker.join();    // 쓰레드가 완전히 끝날 때까지 대기
+    }
+}
 
 void Timer::setTimer(int time, ReturnCallback returnCallback) {
-    current_Time = time * 1000; // 초를 밀리초로 변환
-    if(!worker.joinable()){ //worker 가 살아있다면 갱신
+    current_Time = time * 1000;
+
+    if (!is_running) {
+        if (worker.joinable()) worker.join(); // 이전 쓰레드 잔해 정리
+
+        is_running = true;
         worker = std::thread(&Timer::doTimer, this, returnCallback);
     }
 }
@@ -26,6 +40,19 @@ void Timer::doTimer(ReturnCallback returnCallback){
         std::this_thread::sleep_for(std::chrono::milliseconds(interval));
         current_Time -= interval;
     }
-    returnCallback(); //CleanerController.restore() 사용
+    is_running = false;
+
+    if (returnCallback) {
+        returnCallback();
+    } //CleanerController.restore() 사용
+}
+
+int Timer::getCurrent_Time()
+{
+    return current_Time;
+}
+
+bool Timer::getWorkerRunning() {
+    return is_running;
 }
 

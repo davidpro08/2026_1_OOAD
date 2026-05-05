@@ -18,13 +18,20 @@
 
 class Timer {
 public:
+	Timer();
+	~Timer();
 	using ReturnCallback = std::function<void()>;
 
 	void setTimer(int time, ReturnCallback returnCallback );
 	void doTimer(ReturnCallback returnCallback);
+	int getCurrent_Time();	//forTest
+	bool getWorkerRunning();	//forTest
+
 private:
 	std::thread worker;
-	std::atomic<int> current_Time;
+	std::atomic<bool> is_running = false;
+	std::atomic<int> current_Time = 0;
+	
 };
 
 #endif  //_TIMER_H

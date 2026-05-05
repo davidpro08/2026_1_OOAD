@@ -42,9 +42,9 @@ void MotorController::AvoidObstacle(SensorProvider& provider) {
     MCStop();
 
     // SensorProvider mySensor 인터페이스를 사용해서 왼쪽 오른쪽 상태 받아오기
-    if(provider.getLeftState() == false) {
+    if(provider.getRightState() == false) {
         MCTurnRight();
-    }else if(provider.getRightState() == false){
+    }else if(provider.getLeftState() == false){
         MCTurnLeft();
     }else{
         int retry_limit = 100; 

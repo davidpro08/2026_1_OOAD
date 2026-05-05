@@ -1,0 +1,249 @@
+#include "Simulator/RvcSimulator.h"
+
+#include <chrono>
+#include <iostream>
+#include <sstream>
+#include <thread>
+
+RvcSimulator::RvcSimulator()
+    : motor(&map),
+      frontSensor(&map, &motor, SensorDirection::Front),
+      leftSensor(&map, &motor, SensorDirection::Left),
+      rightSensor(&map, &motor, SensorDirection::Right),
+      dustSensor(&map, &motor, SensorDirection::Dust),
+      cleaner(&map, &motor),
+      sensorController(&bus, &frontSensor, &leftSensor, &rightSensor, &dustSensor),
+      motorController(&bus, motor),
+      cleanerController(&bus, &cleaner),
+      powerController(&bus),
+      powerOn(false) {
+}
+
+RvcSimulator::~RvcSimulator() {
+    turnOff();
+}
+
+void RvcSimulator::run() {
+    std::cout << "RVC CLI 격자 시뮬레이터\n";
+    printHelp();
+    printScreen();
+
+    std::string line;
+    while (true) {
+        std::cout << "\n명령> ";
+        if (!std::getline(std::cin, line)) {
+            break;
+        }
+        if (!handleCommand(line)) {
+            break;
+        }
+    }
+}
+
+void RvcSimulator::reset() {
+    turnOff();
+    map.resetDefault();
+    motor.resetPose(Point(1, 1), Point(0, 1));
+    cleaner.reset();
+    powerOn = false;
+}
+
+void RvcSimulator::turnOn() {
+    if (powerOn) {
+        return;
+    }
+
+    powerOn = true;
+    sensorController.turnOn();
+    motorController.turnOn();
+    powerController.turnOn();
+    sensorController.ChecknPowerUp();
+    cleaner.cleanCurrentCell();
+}
+
+void RvcSimulator::turnOff() {
+    if (!powerOn) {
+        cleaner.reset();
+        return;
+    }
+
+    powerOn = false;
+    sensorController.turnOff();
+    motorController.turnOff();
+    powerController.turnOff();
+}
+
+void RvcSimulator::step() {
+    if (!powerOn) {
+        return;
+    }
+
+    motor.clearBlocked();
+    if (frontSensor.detect()) {
+        sensorController.FrontObstacleDetected();
+    } else {
+        bus.publishMoveForward();
+    }
+
+    sensorController.ChecknPowerUp();
+    cleaner.cleanCurrentCell();
+}
+
+void RvcSimulator::autoStep(int count) {
+    if (count < 0) {
+        return;
+    }
+
+    for (int i = 0; i < count; ++i) {
+        step();
+        printScreen();
+        std::this_thread::sleep_for(std::chrono::milliseconds(150));
+    }
+}
+
+void RvcSimulator::forceFrontObstacle() {
+    if (powerOn) {
+        sensorController.FrontObstacleDetected();
+        sensorController.ChecknPowerUp();
+        cleaner.cleanCurrentCell();
+    }
+}
+
+bool RvcSimulator::addDust(int x, int y) {
+    return map.addDust(Point(x, y));
+}
+
+bool RvcSimulator::toggleWall(int x, int y) {
+    Point point(x, y);
+    if (motor.point.isEqual(point)) {
+        return false;
+    }
+
+    return map.toggleWall(point);
+}
+
+std::string RvcSimulator::statusText() const {
+    std::ostringstream out;
+    out << "전원: " << (powerOn ? "ON" : "OFF")
+        << " | 청소기: " << (cleaner.isTurnedOn() ? "ON" : "OFF")
+        << " | 파워업: " << (cleaner.isPowerUp() ? "ON" : "OFF") << '\n';
+    out << "위치: (" << motor.point.x << ", " << motor.point.y << ")"
+        << " | 방향: " << directionText()
+        << " (" << motor.direction.x << ", " << motor.direction.y << ")\n";
+    out << "센서 - 전방벽: " << (frontSensor.peek() ? "1" : "0")
+        << ", 좌측벽: " << (leftSensor.peek() ? "1" : "0")
+        << ", 우측벽: " << (rightSensor.peek() ? "1" : "0")
+        << ", 현재먼지: " << (dustSensor.peek() ? "1" : "0") << '\n';
+    out << "범례: # 벽, . 빈칸, * 먼지, x 청소완료, ^v<> RVC";
+    return out.str();
+}
+
+std::string RvcSimulator::render() const {
+    std::ostringstream out;
+    for (const auto& line : map.render(motor.point, motor.direction)) {
+        out << line << '\n';
+    }
+    return out.str();
+}
+
+Point RvcSimulator::getRobotPoint() const {
+    return motor.point;
+}
+
+Point RvcSimulator::getRobotDirection() const {
+    return motor.direction;
+}
+
+bool RvcSimulator::isPowerOn() const {
+    return powerOn;
+}
+
+bool RvcSimulator::isCleanerOn() const {
+    return cleaner.isTurnedOn();
+}
+
+bool RvcSimulator::isPowerUp() const {
+    return cleaner.isPowerUp();
+}
+
+void RvcSimulator::printScreen() const {
+    std::cout << '\n' << render();
+    std::cout << statusText() << '\n';
+}
+
+void RvcSimulator::printHelp() const {
+    std::cout
+        << "\n명령 목록\n"
+        << "  on              전원 켜기\n"
+        << "  off             전원 끄기\n"
+        << "  step            1틱 진행\n"
+        << "  auto N          N틱 자동 진행\n"
+        << "  front           전방 장애물 이벤트 강제 발생\n"
+        << "  dust x y        지정 칸에 먼지 추가\n"
+        << "  wall x y        지정 칸 벽 토글\n"
+        << "  status          현재 맵과 상태 출력\n"
+        << "  reset           기본 맵으로 초기화\n"
+        << "  help            도움말 출력\n"
+        << "  quit            종료\n";
+}
+
+bool RvcSimulator::handleCommand(const std::string& line) {
+    std::istringstream input(line);
+    std::string command;
+    input >> command;
+
+    if (command.empty() || command == "status") {
+        printScreen();
+    } else if (command == "help") {
+        printHelp();
+    } else if (command == "on") {
+        turnOn();
+        printScreen();
+    } else if (command == "off") {
+        turnOff();
+        printScreen();
+    } else if (command == "step") {
+        step();
+        printScreen();
+    } else if (command == "auto") {
+        int count = 0;
+        input >> count;
+        autoStep(count);
+    } else if (command == "front") {
+        forceFrontObstacle();
+        printScreen();
+    } else if (command == "dust") {
+        int x = 0;
+        int y = 0;
+        if (input >> x >> y && addDust(x, y)) {
+            printScreen();
+        } else {
+            std::cout << "먼지를 놓을 수 없는 위치입니다.\n";
+        }
+    } else if (command == "wall") {
+        int x = 0;
+        int y = 0;
+        if (input >> x >> y && toggleWall(x, y)) {
+            printScreen();
+        } else {
+            std::cout << "벽을 변경할 수 없는 위치입니다.\n";
+        }
+    } else if (command == "reset") {
+        reset();
+        printScreen();
+    } else if (command == "quit" || command == "exit") {
+        return false;
+    } else {
+        std::cout << "알 수 없는 명령입니다. help를 입력해 주세요.\n";
+    }
+
+    return true;
+}
+
+std::string RvcSimulator::directionText() const {
+    if (motor.direction.x == 0 && motor.direction.y == -1) return "위";
+    if (motor.direction.x == 0 && motor.direction.y == 1) return "아래";
+    if (motor.direction.x == -1 && motor.direction.y == 0) return "왼쪽";
+    if (motor.direction.x == 1 && motor.direction.y == 0) return "오른쪽";
+    return "알수없음";
+}

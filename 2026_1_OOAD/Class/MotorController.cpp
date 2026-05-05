@@ -12,10 +12,10 @@
 
 #include "MotorController.h"
 #include "SensorController.h"
+#include "Motor.h"
 
-MotorController::MotorController(EventBus* bus) {
-    this->bus = bus;
-    isTurnOn = false;
+MotorController::MotorController(EventBus* bus, Motor& motor)
+    : bus(bus), motor(motor), isTurnOn(false) {
 
     bus->subScribeMoveForward([this]() {
         this->MCMoveForward();
@@ -34,16 +34,21 @@ void MotorController::turnOff() {
 }
 
 void MotorController::AvoidObstacle(SensorProvider& provider) {
+    if(isTurnOn == false) {
+        return;
+	}
+
     // 모터 멈춤
     MCStop();
 
     // SensorProvider mySensor 인터페이스를 사용해서 왼쪽 오른쪽 상태 받아오기
-    if(provider.getLeftState() == false) {
+    if(provider.getRightState() == false) {
         MCTurnRight();
-    }else if(provider.getRightState() == false){
+    }else if(provider.getLeftState() == false){
         MCTurnLeft();
     }else{
         int retry_limit = 100; 
+        MCMoveBackward();
         while (provider.getLeftState() && provider.getRightState() && --retry_limit > 0) {
             MCMoveBackward();
         }
@@ -58,22 +63,22 @@ void MotorController::AvoidObstacle(SensorProvider& provider) {
 }
 
 void MotorController::MCStop() {
-    // Motor.stop()
+    motor.stop();
 }
 
 void MotorController::MCMoveForward() {
-    // Motor.moveForward()
+    motor.moveForward();
 }
 
 void MotorController::MCTurnLeft() {
-    // Motor.turnLeft()
+    motor.turnLeft();
 }
 
 void MotorController::MCTurnRight() {
-    // Motor.turnRight()
+    motor.turnRight();
 }
 
 void MotorController::MCMoveBackward() {
-    // Motor.moveBackward()
+    motor.moveBackward();
 }
 

@@ -15,7 +15,7 @@ file(GLOB SRC_LIST
 )
 
 add_library(OOAD_Lib STATIC
-   ${SRC_LIST}
+    ${SRC_LIST}
 )
 
 target_include_directories(OOAD_Lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

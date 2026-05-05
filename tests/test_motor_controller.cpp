@@ -30,27 +30,39 @@ namespace MotorControllerTest {
     class FakeMotor : public Motor {
 
     public:
+    int stopCount = 0;
+    int forwardCount = 0;
+    int backwardCount = 0;
+    int leftCount = 0;
+    int rightCount = 0;
+
 		Point point = Point(0, 0);
 		// 초기 방향은 위쪽으로 가도록 설정
 		Point direction = Point(0, 1);
-        void stop() {  }
+        void stop() { 
+            stopCount++;
+        }
         void moveForward() { 
             point.x = point.x + direction.x; 
 			point.y = point.y + direction.y;
+            forwardCount++;
         }
         void turnLeft() {
 			Point temp = direction;
 			direction.x = -temp.y;
 			direction.y = temp.x;
+            leftCount++;
         }
         void turnRight() {
 			Point temp = direction;
 			direction.x = temp.y;
 			direction.y = -temp.x;
+            rightCount++;
         }
         void moveBackward() {
             point.x = point.x + direction.x;
             point.y = point.y + direction.y;
+            backwardCount++;
         }
     };
 
@@ -77,11 +89,9 @@ namespace MotorControllerTest {
 		motorController->turnOn();
 
         motorController->AvoidObstacle(sensorProvider);
-        
-        // turnOff이므로 Stop 상태 유지
         ASSERT_TRUE(motor.point.isEqual(Point(1, 0)));
+        ASSERT_EQ(motor.stopCount, 1);
 
-        ASSERT_FALSE(motor.direction.isEqual(Point(0, 0)));
     };
 
     TEST_F(MotorControllerPowerTest, TurnOff) {
@@ -91,8 +101,11 @@ namespace MotorControllerTest {
 
 		// turnOff이므로 Stop 상태 유지
         ASSERT_TRUE(motor.point.isEqual(Point(0,0)));
-
-        ASSERT_FALSE(motor.direction.isEqual(Point(1, 0)));
+        ASSERT_EQ(motor.stopCount, 0);
+        ASSERT_EQ(motor.forwardCount, 0);
+        ASSERT_EQ(motor.backwardCount, 0);
+        ASSERT_EQ(motor.leftCount, 0);
+        ASSERT_EQ(motor.rightCount, 0);
     };
 
     class MotorControllerAvoidTest : public ::testing::Test {
@@ -122,6 +135,12 @@ namespace MotorControllerTest {
         ASSERT_FALSE(motor.point.isEqual(Point(0, 1)));
         ASSERT_FALSE(motor.point.isEqual(Point(-1, 0)));        
         ASSERT_FALSE(motor.point.isEqual(Point(0, -1)));
+
+        ASSERT_EQ(motor.stopCount, 1);
+        ASSERT_EQ(motor.forwardCount, 1);
+        ASSERT_EQ(motor.backwardCount, 0);
+        ASSERT_EQ(motor.leftCount, 0);
+        ASSERT_EQ(motor.rightCount, 1);
     };
 
     TEST_F(MotorControllerAvoidTest, RightObstacle) {
@@ -131,10 +150,16 @@ namespace MotorControllerTest {
 
         motorController->AvoidObstacle(sensorProvider);
 
-        ASSERT_TRUE(motor.point.isEqual(Point(-1, 0)));
+        ASSERT_TRUE(motor.point.isEqual(Point(1, 0)));
         ASSERT_FALSE(motor.point.isEqual(Point(0, 1)));
-        ASSERT_FALSE(motor.point.isEqual(Point(1, 0)));
+        ASSERT_FALSE(motor.point.isEqual(Point(-1, 0)));
         ASSERT_FALSE(motor.point.isEqual(Point(0, -1)));
+
+        ASSERT_EQ(motor.stopCount, 1);
+        ASSERT_EQ(motor.forwardCount, 0);
+        ASSERT_EQ(motor.backwardCount, 0);
+        ASSERT_EQ(motor.leftCount, 0);
+        ASSERT_EQ(motor.rightCount, 1);
     };
 
     TEST_F(MotorControllerAvoidTest, LeftObstacle) {
@@ -148,6 +173,28 @@ namespace MotorControllerTest {
         ASSERT_FALSE(motor.point.isEqual(Point(0, 1)));
         ASSERT_FALSE(motor.point.isEqual(Point(-1, 0)));
         ASSERT_FALSE(motor.point.isEqual(Point(0, -1)));
+
+        ASSERT_EQ(motor.stopCount, 1);
+        ASSERT_EQ(motor.forwardCount, 0);
+        ASSERT_EQ(motor.backwardCount, 0);
+        ASSERT_EQ(motor.leftCount, 0);
+        ASSERT_EQ(motor.rightCount, 1);
+    };
+
+    TEST_F(MotorControllerAvoidTest, LeftAndRightObstacle) {
+        // 앞, 왼쪽, 오른쪽이 막혀있는 상황
+        sensorProvider.left = true;
+        sensorProvider.right = true;
+
+        motorController->AvoidObstacle(sensorProvider);
+
+        ASSERT_TRUE(motor.point.isEqual(Point(0, 0)));
+
+        ASSERT_EQ(motor.stopCount, 0);
+        ASSERT_EQ(motor.forwardCount, 0);
+        ASSERT_EQ(motor.backwardCount, 0);
+        ASSERT_EQ(motor.leftCount, 1);
+        ASSERT_EQ(motor.rightCount, 1);
     };
 
 }

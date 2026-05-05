@@ -16,7 +16,7 @@
 #include "SensorProvider.h"
 #include "IPower.h"
 #include "EventBus.h"
-#include "IsenSor.h"
+#include "ISensor.h"
 
 class SensorController : public SensorProvider, public IPower {
 public:

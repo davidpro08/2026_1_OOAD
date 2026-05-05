@@ -2,12 +2,21 @@
 #include "Class/MotorController.h"
 #include "Class/SensorController.h"
 #include "Class/SensorProvider.h"
+#include "Class/ISensor.h"
 
 #include <gtest/gtest.h>
 #include <memory>
 #include <vector>
 
 namespace MotorControllerTest {
+
+            class FakeSensor : public ISensor {
+public:
+    bool value = true;
+    bool detect() override{
+        return value; 
+    }
+};
 
     class FakeSensorProvider : public SensorProvider {
     public:
@@ -106,6 +115,7 @@ namespace MotorControllerTest {
 			sensorProvider.left = false;
             sensorProvider.right = false;
         }
+
     };
 
     TEST_F(MotorControllerPowerTest, TurnOn) {
@@ -251,7 +261,12 @@ namespace MotorControllerTest {
     };
 
     TEST_F(MotorControllerAvoidTest, EventAvoid) {
-        SensorController sensor(&bus);
+        FakeSensor frontSensor;
+        FakeSensor leftSensor;
+        FakeSensor rightSensor;
+        FakeSensor dustSensor;
+
+        SensorController sensor(&bus,&frontSensor,&leftSensor,&rightSensor,&dustSensor);
         bus.publishAvoidObstacle(&sensor);
 
         ASSERT_EQ(motor.stopCount, 1);

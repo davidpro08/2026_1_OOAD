@@ -16,10 +16,11 @@
 #include "IPower.h"
 #include "SensorProvider.h"
 #include "EventBus.h"
+#include "Motor.h"
 
 class MotorController : public IPower {
 public:
-	MotorController(EventBus* bus);
+	MotorController(EventBus* bus, Motor& motor);
 	void turnOn();
 	void turnOff() override;
 	void AvoidObstacle(SensorProvider& provider);
@@ -27,6 +28,7 @@ public:
 private:
 	EventBus* bus;
 	SensorProvider mySensor;
+	Motor& motor;
 	bool isTurnOn;
 	void MCMoveForward();
 	void MCTurnLeft();

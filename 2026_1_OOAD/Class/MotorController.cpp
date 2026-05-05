@@ -12,10 +12,10 @@
 
 #include "MotorController.h"
 #include "SensorController.h"
+#include "Motor.h"
 
-MotorController::MotorController(EventBus* bus) {
-    this->bus = bus;
-    isTurnOn = false;
+MotorController::MotorController(EventBus* bus, Motor& motor)
+    : bus(bus), motor(motor), isTurnOn(false) {
 
     bus->subScribeMoveForward([this]() {
         this->MCMoveForward();
@@ -34,6 +34,10 @@ void MotorController::turnOff() {
 }
 
 void MotorController::AvoidObstacle(SensorProvider& provider) {
+    if(isTurnOn == false) {
+        return;
+	}
+
     // 모터 멈춤
     MCStop();
 
@@ -58,22 +62,22 @@ void MotorController::AvoidObstacle(SensorProvider& provider) {
 }
 
 void MotorController::MCStop() {
-    // Motor.stop()
+    motor.stop();
 }
 
 void MotorController::MCMoveForward() {
-    // Motor.moveForward()
+    motor.moveForward();
 }
 
 void MotorController::MCTurnLeft() {
-    // Motor.turnLeft()
+    motor.turnLeft();
 }
 
 void MotorController::MCTurnRight() {
-    // Motor.turnRight()
+    motor.turnRight();
 }
 
 void MotorController::MCMoveBackward() {
-    // Motor.moveBackward()
+    motor.moveBackward();
 }
 

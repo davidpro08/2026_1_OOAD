@@ -14,6 +14,7 @@
 #define _TICK_H
 
 #include <thread>
+#include <atomic>
 #include "SensorController.h"
 #include "EventBus.h"
 
@@ -21,9 +22,10 @@ class Tick {
 public:
 	Tick(EventBus* bus, SensorController* sensor);
 	~Tick();
-	bool doCheck;
+	std::atomic<bool> doCheck;
 	void DoDustCheck();
 	void StopDustCheck();
+	bool getDoCheck();
 
 private:
 	std::thread worker;

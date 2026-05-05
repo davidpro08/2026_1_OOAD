@@ -12,10 +12,7 @@
 const int DUST_THRESHOLD = 5;
 
 #include "SensorController.h"
-#include "../HDWARE/FrontSensor.cpp"
-#include "../HDWARE/LeftSensor.cpp"
-#include "../HDWARE/RightSensor.cpp"
-#include "../HDWARE/DustSensor.cpp"
+#include "ISensor.h"
 
 SensorController::SensorController(EventBus* bus, ISensor* frontSensor, ISensor* leftSensor, ISensor* rightSensor, ISensor* dustSensor) {
     this->bus = bus;

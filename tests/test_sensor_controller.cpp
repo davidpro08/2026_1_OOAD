@@ -7,10 +7,8 @@
 
 class FakeSensor : public ISensor {
 public:
-    bool detect() override {
-        return true; // 항상 감지된다고 가정
-    }
-    bool detect(bool value) {
+    bool value = true;
+    bool detect() override{
         return value; 
     }
 };
@@ -41,7 +39,7 @@ TEST_F(SensorControllerTest, TestTurnOff) {
     EXPECT_TRUE(sensorController.getIsTurnOn() == false);//결과
 }
 
-TEST_F(SensorControllerTest, TestFrontObstacleDetected) {
+TEST_F(SensorControllerTest, TestFrontObstacleDetectedTrue) {
     bool isAvoidObstacleCalled = false;
 
     bus.subScribeAvoidObstacle([&isAvoidObstacleCalled](SensorController* sender) {
@@ -51,9 +49,11 @@ TEST_F(SensorControllerTest, TestFrontObstacleDetected) {
     sensorController.FrontObstacleDetected();
 
     EXPECT_TRUE(isAvoidObstacleCalled);
-}
+}// 이거는 ISensor가 아니니까 다르게 해야하나
 
-TEST_F(SensorControllerTest, TestChecknPowerUp) {
+TEST_F(SensorControllerTest, TestChecknPowerUpTrue) {
+	dustSensor.value = true; // 먼지 감지 상태로 설정
+
     bool isDetectedDustCalled = false;
 
     bus.subScribeDetectedDust([&isDetectedDustCalled]() {
@@ -65,10 +65,38 @@ TEST_F(SensorControllerTest, TestChecknPowerUp) {
     EXPECT_TRUE(isDetectedDustCalled);
 }
 
-TEST_F(SensorControllerTest, TestGetLeftState) {
-    EXPECT_TRUE(sensorController.getLeftState());
-}// 항상 감지된다고 가정한 FakeSensor를 사용하여 getLeftState가 true를 반환하는지 테스트로 충분한가
+TEST_F(SensorControllerTest, TestChecknPowerUp_WhenNoDust) {
+    dustSensor.value = false;// 먼지 비감지 상태로 설정
 
-TEST_F(SensorControllerTest, TestGetRightState) {
-    EXPECT_TRUE(sensorController.getRightState());
-}// 항상 감지된다고 가정한 FakeSensor를 사용하여 getRightState가 true를 반환하는지 테스트로 충분한가
+    bool isDetectedDustCalled = false;
+
+    bus.subScribeDetectedDust([&isDetectedDustCalled]() {
+        isDetectedDustCalled = true;
+        });
+
+    sensorController.ChecknPowerUp();
+
+    EXPECT_FALSE(isDetectedDustCalled);
+}
+
+TEST_F(SensorControllerTest, TestGetLeftStateTrue) {
+    leftSensor.value = true;
+
+    EXPECT_TRUE(sensorController.getLeftState());
+}
+
+TEST_F(SensorControllerTest, TestGetLeftStateFalse) {
+        leftSensor.value = false;
+
+        EXPECT_FALSE(sensorController.getLeftState());
+}
+
+TEST_F(SensorControllerTest, TestGetRightStateFalse) {
+	  rightSensor.value = false;
+      EXPECT_FALSE(sensorController.getRightState());
+}
+
+TEST_F(SensorControllerTest, TestGetRightStateTrue) {
+      rightSensor.value = true; 
+      EXPECT_TRUE(sensorController.getRightState());
+}

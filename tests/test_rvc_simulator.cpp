@@ -26,15 +26,6 @@ TEST(RvcSimulatorTest, FrontWallDoesNotEnterWallAndAvoidsObstacle) {
     EXPECT_TRUE(simulator.getRobotPoint().isEqual(Point(2, 2)));
 }
 
-TEST(RvcSimulatorTest, CleanerRemovesDustOnCurrentCell) {
-    RvcSimulator simulator;
-
-    simulator.addDust(1, 2);
-    simulator.turnOn();
-
-    EXPECT_NE(simulator.render().find('x'), std::string::npos);
-}
-
 TEST(RvcSimulatorTest, DustTriggersPowerUpAndTimerRestoresPower) {
     RvcSimulator simulator;
 

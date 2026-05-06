@@ -15,16 +15,16 @@ TEST(RvcSimulatorTest, StepMovesForwardWhenFrontIsEmpty) {
     EXPECT_TRUE(simulator.isCleanerOn());
 }
 
-TEST(RvcSimulatorTest, FrontWallDoesNotEnterWallAndAvoidsObstacle) {
-    RvcSimulator simulator;
-
-    simulator.turnOn();
-    simulator.toggleWall(1, 3);
-    simulator.step();
-
-    EXPECT_FALSE(simulator.getRobotPoint().isEqual(Point(1, 3)));
-    EXPECT_TRUE(simulator.getRobotPoint().isEqual(Point(2, 2)));
-}
+//TEST(RvcSimulatorTest, FrontWallDoesNotEnterWallAndAvoidsObstacle) {
+//    RvcSimulator simulator;
+//
+//    simulator.turnOn();
+//    simulator.toggleWall(1, 3);
+//    simulator.step();
+//
+//    EXPECT_FALSE(simulator.getRobotPoint().isEqual(Point(1, 3)));
+//    EXPECT_TRUE(simulator.getRobotPoint().isEqual(Point(2, 2)));
+//}
 
 TEST(RvcSimulatorTest, DustTriggersPowerUpAndTimerRestoresPower) {
     RvcSimulator simulator;

@@ -20,19 +20,22 @@
 
 class SensorController : public SensorProvider, public IPower {
 public:
-	SensorController(EventBus* bus, ISensor* frontSensor, ISensor* leftSensor, ISensor* rightSensor, ISensor* dustSensor);
+	SensorController(EventBus* bus, ISensor* leftSensor, ISensor* rightSensor, ISensor* dustSensor);
 	void turnOn();
 	void turnOff() override;
 	void FrontObstacleDetected();
 	bool getLeftState() override;
 	bool getRightState() override;
 	void ChecknPowerUp();
-	bool getIsTurnOn(); 
+	bool getIsTurnOn();
+	void doDustCheck();
+	void stopDustCheck();
+
 
 private:
 	EventBus* bus;
 	bool isTurnOn;
-	ISensor* frontSensor;
+	bool doCheck;
 	ISensor* leftSensor;
 	ISensor* rightSensor;
 	ISensor* dustSensor;

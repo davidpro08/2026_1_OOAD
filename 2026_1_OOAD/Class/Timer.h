@@ -23,14 +23,12 @@ public:
 	using ReturnCallback = std::function<void()>;
 
 	void setTimer(int time, ReturnCallback returnCallback );
-	void doTimer(ReturnCallback returnCallback);
-	int getCurrent_Time();	//forTest
-	bool getWorkerRunning();	//forTest
+	void syncTimerDigitalClock();
+	int getExpire_Time();	//forTest
+	ReturnCallback rc;
 
 private:
-	std::thread worker;
-	std::atomic<bool> is_running = false;
-	std::atomic<int> current_Time = 0;
+	std::atomic<int> Expire_Time = 0;
 	
 };
 

@@ -13,46 +13,30 @@
 #include "Timer.h"
 
 Timer::Timer() {
-    current_Time = 0;
 }
 
 Timer::~Timer() {
-    if (worker.joinable()) {
-        current_Time = 0; // 쓰레드가 loop를 빨리 빠져나오게 유도
-        worker.join();    // 쓰레드가 완전히 끝날 때까지 대기
-    }
+
 }
 
 void Timer::setTimer(int time, ReturnCallback returnCallback) {
-    current_Time = time * 1000;
 
-    if (!is_running) {
-        if (worker.joinable()) worker.join(); // 이전 쓰레드 잔해 정리
+    Expire_Time = time;
+    rc = returnCallback;
+}
 
-        is_running = true;
-        worker = std::thread(&Timer::doTimer, this, returnCallback);
+void Timer::syncTimerDigitalClock() {   //인터럽트
+    if (Expire_Time == 0) return;
+
+    Expire_Time--;
+    if (Expire_Time == 0) {
+        if (rc) {
+            rc();   //restore 진행
+        }
     }
 }
 
-void Timer::doTimer(ReturnCallback returnCallback){
-    const int interval = 100; // 50ms    
-    while (current_Time > 0) {
-        current_Time -= interval;
-        std::this_thread::sleep_for(std::chrono::milliseconds(interval));
-    }
-    is_running = false;
-
-    if (returnCallback) {
-        returnCallback();
-    } //CleanerController.restore() 사용
-}
-
-int Timer::getCurrent_Time()
+int Timer::getExpire_Time()
 {
-    return current_Time;
+    return Expire_Time;
 }
-
-bool Timer::getWorkerRunning() {
-    return is_running;
-}
-

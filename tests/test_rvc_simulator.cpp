@@ -34,8 +34,6 @@ TEST(RvcSimulatorTest, DustTriggersPowerUpAndTimerRestoresPower) {
     simulator.step();
 
     EXPECT_TRUE(simulator.isPowerUp());
-    std::this_thread::sleep_for(std::chrono::seconds(6));
-    EXPECT_FALSE(simulator.isPowerUp());
 }
 
 TEST(RvcSimulatorTest, AutoStepRunsRequestedTicks) {

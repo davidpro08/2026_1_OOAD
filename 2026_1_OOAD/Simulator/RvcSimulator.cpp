@@ -88,10 +88,11 @@ void RvcSimulator::step() {
     }
 
     motor.clearBlocked();
-    if (frontSensor.detect() && !motorController.avoiding) {
+    if (frontSensor.detect() && !motorController.isAvoiding()) {
         sensorController.FrontObstacleDetected();
     }
     motorController.MCMove();
+    cleanerController.tick();
 
     sensorController.ChecknPowerUp();
     cleaner.cleanCurrentCell();

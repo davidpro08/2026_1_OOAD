@@ -16,8 +16,9 @@
 
 class SensorProvider {
 public:
-	virtual bool getLeftState();
-	virtual bool getRightState();
+	virtual ~SensorProvider() = default;
+	virtual bool getLeftState() = 0;
+	virtual bool getRightState() = 0;
 };
 
 #endif  //_SENSORPROVIDER_H

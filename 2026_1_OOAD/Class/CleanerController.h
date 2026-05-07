@@ -27,6 +27,7 @@ public:
 	void turnOff() override;
 	void CCpowerUp();
 	void CCpowerRestore();
+	void tick();
 private:
 	bool isTurnOn;
 	bool powerUp;

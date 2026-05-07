@@ -54,3 +54,7 @@ void CleanerController::CCpowerUp() {
 void CleanerController::CCpowerRestore() {
     cleaner->powerRestore();
 }
+
+void CleanerController::tick() {
+    timer.syncTimerDigitalClock();
+}

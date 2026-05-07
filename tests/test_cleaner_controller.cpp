@@ -78,7 +78,19 @@ TEST(CleanerTest, CleanerControllerBusSubscribeCheck) {
 
 //PowerUp�� Ÿ�̸� ȣ�� Check
 TEST(CleanerTest, WhenPowerUpTimerCallingCheck) {
-    
+    EventBus bus;
+    FakeHwCleaner testHwCleaner;
+    TestCleaner myTestCleaner(&bus, &testHwCleaner);
+
+    myTestCleaner.turnOn();
+    myTestCleaner.CCpowerUp();
+    EXPECT_TRUE(testHwCleaner.ispowerUp);
+
+    for (int i = 0; i < 5; ++i) {
+        myTestCleaner.tick();
+    }
+
+    EXPECT_FALSE(testHwCleaner.ispowerUp);
 }
 
 //Hw ����

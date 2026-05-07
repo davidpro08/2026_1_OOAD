@@ -10,6 +10,7 @@
 #include "Simulator/SimulatedMotor.h"
 #include "Simulator/SimulatedSensor.h"
 
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -20,6 +21,7 @@ public:
 
     void run();
     void reset();
+    void resetRandomMap(uint32_t seed = 0);
     void turnOn();
     void turnOff();
     void step();

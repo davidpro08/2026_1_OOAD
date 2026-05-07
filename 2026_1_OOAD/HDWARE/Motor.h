@@ -29,10 +29,6 @@ class Motor {
 public:
     virtual ~Motor() = default;
 
-    Point point = Point(0, 0);
-    // 초기 방향은 위쪽으로 가도록 설정
-    Point direction = Point(0, 1);
-
     virtual void stop();
     virtual void moveForward();
     virtual void turnLeft();

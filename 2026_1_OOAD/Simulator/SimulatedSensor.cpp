@@ -1,6 +1,7 @@
 #include "Simulator/SimulatedSensor.h"
+#include "Simulator/SimulatedMotor.h"
 
-SimulatedSensor::SimulatedSensor(GridMap* map, Motor* motor, SensorDirection direction)
+SimulatedSensor::SimulatedSensor(GridMap* map, SimulatedMotor* motor, SensorDirection direction)
     : map(map), motor(motor), direction(direction) {
 }
 
@@ -14,20 +15,21 @@ bool SimulatedSensor::peek() const {
     }
 
     if (direction == SensorDirection::Dust) {
-        return map->hasDust(motor->point);
+        return map->hasDust(motor->getPosition());
     }
 
     return map->isWall(getTargetPoint());
 }
 
 Point SimulatedSensor::getTargetPoint() const {
-    Point vector = motor->direction;
+    Point facing = motor->getFacing();
 
     if (direction == SensorDirection::Left) {
-        vector = Point(-motor->direction.y, motor->direction.x);
+        facing = Point(-facing.y, facing.x);
     } else if (direction == SensorDirection::Right) {
-        vector = Point(motor->direction.y, -motor->direction.x);
+        facing = Point(facing.y, -facing.x);
     }
 
-    return Point(motor->point.x + vector.x, motor->point.y + vector.y);
+    Point pos = motor->getPosition();
+    return Point(pos.x + facing.x, pos.y + facing.y);
 }

@@ -23,7 +23,7 @@ add_library(OOAD_Lib STATIC
 target_include_directories(OOAD_Lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # 이 프로젝트의 실행 파일 생성
-add_executable(2026_1_OOAD main.cpp  "Class/HwCleaner.h")
+add_executable(2026_1_OOAD main.cpp)
 target_link_libraries(2026_1_OOAD PRIVATE OOAD_Lib)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)

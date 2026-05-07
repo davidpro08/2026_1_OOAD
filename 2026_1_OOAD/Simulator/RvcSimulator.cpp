@@ -48,6 +48,14 @@ void RvcSimulator::reset() {
     powerOn = false;
 }
 
+void RvcSimulator::resetRandomMap(uint32_t seed) {
+    turnOff();
+    map.resetRandom(seed);
+    motor.resetPose(Point(1, 1), Point(0, 1));
+    cleaner.reset();
+    powerOn = false;
+}
+
 void RvcSimulator::turnOn() {
     if (powerOn) {
         return;
@@ -115,7 +123,7 @@ bool RvcSimulator::addDust(int x, int y) {
 
 bool RvcSimulator::toggleWall(int x, int y) {
     Point point(x, y);
-    if (motor.point.isEqual(point)) {
+    if (motor.getPosition().isEqual(point)) {
         return false;
     }
 
@@ -127,9 +135,9 @@ std::string RvcSimulator::statusText() const {
     out << "전원: " << (powerOn ? "ON" : "OFF")
         << " | 청소기: " << (cleaner.isTurnedOn() ? "ON" : "OFF")
         << " | 파워업: " << (cleaner.isPowerUp() ? "ON" : "OFF") << '\n';
-    out << "위치: (" << motor.point.x << ", " << motor.point.y << ")"
+    out << "위치: (" << motor.getPosition().x << ", " << motor.getPosition().y << ")"
         << " | 방향: " << directionText()
-        << " (" << motor.direction.x << ", " << motor.direction.y << ")\n";
+        << " (" << motor.getFacing().x << ", " << motor.getFacing().y << ")\n";
     out << "센서 - 전방벽: " << (frontSensor.peek() ? "1" : "0")
         << ", 좌측벽: " << (leftSensor.peek() ? "1" : "0")
         << ", 우측벽: " << (rightSensor.peek() ? "1" : "0")
@@ -140,18 +148,18 @@ std::string RvcSimulator::statusText() const {
 
 std::string RvcSimulator::render() const {
     std::ostringstream out;
-    for (const auto& line : map.render(motor.point, motor.direction)) {
+    for (const auto& line : map.render(motor.getPosition(), motor.getFacing())) {
         out << line << '\n';
     }
     return out.str();
 }
 
 Point RvcSimulator::getRobotPoint() const {
-    return motor.point;
+    return motor.getPosition();
 }
 
 Point RvcSimulator::getRobotDirection() const {
-    return motor.direction;
+    return motor.getFacing();
 }
 
 bool RvcSimulator::isPowerOn() const {
@@ -183,6 +191,7 @@ void RvcSimulator::printHelp() const {
         << "  wall x y        지정 칸 벽 토글\n"
         << "  status          현재 맵과 상태 출력\n"
         << "  reset           기본 맵으로 초기화\n"
+        << "  randmap [시드]   무작위 맵(시드 생략 시 매번 다름)\n"
         << "  help            도움말 출력\n"
         << "  quit            종료\n";
 }
@@ -228,6 +237,14 @@ bool RvcSimulator::handleCommand(const std::string& line) {
         } else {
             std::cout << "벽을 변경할 수 없는 위치입니다.\n";
         }
+    } else if (command == "randmap") {
+        uint32_t seed = 0;
+        if (input >> seed) {
+            resetRandomMap(seed);
+        } else {
+            resetRandomMap(0);
+        }
+        printScreen();
     } else if (command == "reset") {
         reset();
         printScreen();
@@ -241,9 +258,10 @@ bool RvcSimulator::handleCommand(const std::string& line) {
 }
 
 std::string RvcSimulator::directionText() const {
-    if (motor.direction.x == 0 && motor.direction.y == -1) return "위";
-    if (motor.direction.x == 0 && motor.direction.y == 1) return "아래";
-    if (motor.direction.x == -1 && motor.direction.y == 0) return "왼쪽";
-    if (motor.direction.x == 1 && motor.direction.y == 0) return "오른쪽";
+    Point d = motor.getFacing();
+    if (d.x == 0 && d.y == -1) return "아래";
+    if (d.x == 0 && d.y == 1) return "위";
+    if (d.x == -1 && d.y == 0) return "왼쪽";
+    if (d.x == 1 && d.y == 0) return "오른쪽";
     return "알수없음";
 }

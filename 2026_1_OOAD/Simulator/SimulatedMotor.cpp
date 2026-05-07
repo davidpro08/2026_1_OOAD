@@ -1,15 +1,35 @@
 #include "Simulator/SimulatedMotor.h"
 
-SimulatedMotor::SimulatedMotor(GridMap* map) : map(map), blocked(false) {
-    resetPose(Point(1, 1), Point(0, 1));
+SimulatedMotor::SimulatedMotor(GridMap* map)
+    : map(map), blocked(false), position(1, 1), facing(0, 1) {
+}
+
+Point SimulatedMotor::getPosition() const {
+    return position;
+}
+
+Point SimulatedMotor::getFacing() const {
+    return facing;
 }
 
 void SimulatedMotor::moveForward() {
-    tryMove(Point(point.x + direction.x, point.y + direction.y));
+    tryMove(Point(position.x + facing.x, position.y + facing.y));
 }
 
 void SimulatedMotor::moveBackward() {
-    tryMove(Point(point.x - direction.x, point.y - direction.y));
+    tryMove(Point(position.x - facing.x, position.y - facing.y));
+}
+
+void SimulatedMotor::turnLeft() {
+    Point temp = facing;
+    facing.x = -temp.y;
+    facing.y = temp.x;
+}
+
+void SimulatedMotor::turnRight() {
+    Point temp = facing;
+    facing.x = temp.y;
+    facing.y = -temp.x;
 }
 
 bool SimulatedMotor::wasBlocked() const {
@@ -20,9 +40,9 @@ void SimulatedMotor::clearBlocked() {
     blocked = false;
 }
 
-void SimulatedMotor::resetPose(Point newPoint, Point newDirection) {
-    point = newPoint;
-    direction = newDirection;
+void SimulatedMotor::resetPose(Point newPosition, Point newFacing) {
+    position = newPosition;
+    facing = newFacing;
     blocked = false;
 }
 
@@ -32,7 +52,7 @@ bool SimulatedMotor::tryMove(Point next) {
         return false;
     }
 
-    point = next;
+    position = next;
     blocked = false;
     return true;
 }

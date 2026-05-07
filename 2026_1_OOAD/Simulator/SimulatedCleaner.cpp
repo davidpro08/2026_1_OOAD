@@ -1,6 +1,7 @@
 #include "Simulator/SimulatedCleaner.h"
+#include "Simulator/SimulatedMotor.h"
 
-SimulatedCleaner::SimulatedCleaner(GridMap* map, Motor* motor)
+SimulatedCleaner::SimulatedCleaner(GridMap* map, SimulatedMotor* motor)
     : map(map), motor(motor), turnedOn(false), powerUpMode(false) {
 }
 
@@ -36,7 +37,7 @@ bool SimulatedCleaner::cleanCurrentCell() {
         return false;
     }
 
-    return map->clean(motor->point);
+    return map->clean(motor->getPosition());
 }
 
 void SimulatedCleaner::reset() {

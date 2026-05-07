@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Class/Motor.h"
+#include "HDWARE/Motor.h"
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -17,6 +18,8 @@ public:
     GridMap();
 
     void resetDefault();
+    /// seed가 0이면 매번 다른 맵, 0이 아니면 재현 가능한 난수 시퀀스
+    void resetRandom(uint32_t seed = 0);
     int getWidth() const;
     int getHeight() const;
     bool isInside(Point point) const;
@@ -34,6 +37,7 @@ private:
     int height;
     std::vector<std::vector<CellType>> cells;
 
+    void fillBorderWalls();
     void setWall(Point point);
     void setDust(Point point);
 };

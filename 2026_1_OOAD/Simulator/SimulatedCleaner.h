@@ -1,12 +1,13 @@
 #pragma once
 
 #include "Class/HwCleaner.h"
-#include "Class/Motor.h"
 #include "Simulator/GridMap.h"
+
+class SimulatedMotor;
 
 class SimulatedCleaner : public HwCleaner {
 public:
-    SimulatedCleaner(GridMap* map, Motor* motor);
+    SimulatedCleaner(GridMap* map, SimulatedMotor* motor);
 
     void powerUp() override;
     void powerRestore() override;
@@ -20,7 +21,7 @@ public:
 
 private:
     GridMap* map;
-    Motor* motor;
+    SimulatedMotor* motor;
     bool turnedOn;
     bool powerUpMode;
 };

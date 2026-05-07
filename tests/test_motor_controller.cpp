@@ -115,8 +115,11 @@ public:
 		motorController->turnOn();
 
         motorController->AvoidObstacle(sensorProvider);
+        motorController->MCMove();
         ASSERT_TRUE(motor.point.isEqual(Point(1, 0)));
-        ASSERT_EQ(motor.stopCount, 1);
+        ASSERT_EQ(motor.stopCount, 0);
+        ASSERT_EQ(motor.forwardCount, 1);
+        ASSERT_EQ(motor.rightCount, 1);
 
     };
 
@@ -156,13 +159,14 @@ public:
 		sensorProvider.right = false;
 
         motorController->AvoidObstacle(sensorProvider);
+        motorController->MCMove();
 
         ASSERT_TRUE(motor.point.isEqual(Point(1, 0)));
         ASSERT_FALSE(motor.point.isEqual(Point(0, 1)));
         ASSERT_FALSE(motor.point.isEqual(Point(-1, 0)));        
         ASSERT_FALSE(motor.point.isEqual(Point(0, -1)));
 
-        ASSERT_EQ(motor.stopCount, 1);
+        ASSERT_EQ(motor.stopCount, 0);
         ASSERT_EQ(motor.forwardCount, 1);
         ASSERT_EQ(motor.backwardCount, 0);
         ASSERT_EQ(motor.leftCount, 0);
@@ -175,13 +179,14 @@ public:
         sensorProvider.right = true;
 
         motorController->AvoidObstacle(sensorProvider);
+        motorController->MCMove();
 
         ASSERT_TRUE(motor.point.isEqual(Point(-1, 0)));
         ASSERT_FALSE(motor.point.isEqual(Point(0, 1)));
         ASSERT_FALSE(motor.point.isEqual(Point(1, 0)));
         ASSERT_FALSE(motor.point.isEqual(Point(0, -1)));
 
-        ASSERT_EQ(motor.stopCount, 1);
+        ASSERT_EQ(motor.stopCount, 0);
         ASSERT_EQ(motor.forwardCount, 1);
         ASSERT_EQ(motor.backwardCount, 0);
         ASSERT_EQ(motor.leftCount, 1);
@@ -194,13 +199,14 @@ public:
         sensorProvider.right = false;
 
         motorController->AvoidObstacle(sensorProvider);
+        motorController->MCMove();
 
         ASSERT_TRUE(motor.point.isEqual(Point(1, 0)));
         ASSERT_FALSE(motor.point.isEqual(Point(0, 1)));
         ASSERT_FALSE(motor.point.isEqual(Point(-1, 0)));
         ASSERT_FALSE(motor.point.isEqual(Point(0, -1)));
 
-        ASSERT_EQ(motor.stopCount, 1);
+        ASSERT_EQ(motor.stopCount, 0);
         ASSERT_EQ(motor.forwardCount, 1);
         ASSERT_EQ(motor.backwardCount, 0);
         ASSERT_EQ(motor.leftCount, 0);
@@ -213,8 +219,12 @@ public:
         scripted.rightStates = {true, true, true, false, false, false};
 
         motorController->AvoidObstacle(scripted);
+        motorController->MCMove();
+        motorController->MCMove();
+        motorController->MCMove();
+        motorController->MCMove();
 
-        ASSERT_EQ(motor.stopCount, 1);
+        ASSERT_EQ(motor.stopCount, 0);
         ASSERT_EQ(motor.backwardCount, 3);
         ASSERT_EQ(motor.rightCount, 1);
         ASSERT_EQ(motor.leftCount, 0);
@@ -229,14 +239,17 @@ public:
         scripted.rightStates = {true};
 
         motorController->AvoidObstacle(scripted);
+        for (int i = 0; i < 100; ++i) {
+            motorController->MCMove();
+        }
 
-        ASSERT_EQ(motor.stopCount, 1);
+        ASSERT_EQ(motor.stopCount, 0);
         ASSERT_EQ(motor.backwardCount, 100);
         ASSERT_EQ(motor.rightCount, 0);
         ASSERT_EQ(motor.leftCount, 0);
-        ASSERT_EQ(motor.forwardCount, 1);
+        ASSERT_EQ(motor.forwardCount, 0);
 
-        ASSERT_TRUE(motor.point.isEqual(Point(0, -99)));
+        ASSERT_TRUE(motor.point.isEqual(Point(0, -100)));
     };
 
     TEST_F(MotorControllerAvoidTest, SeqLeftOpen) {
@@ -245,6 +258,10 @@ public:
         scripted.rightStates = {true, true, true, true, true};
 
         motorController->AvoidObstacle(scripted);
+        motorController->MCMove();
+        motorController->MCMove();
+        motorController->MCMove();
+        motorController->MCMove();
 
         ASSERT_EQ(motor.backwardCount, 3);
         ASSERT_EQ(motor.leftCount, 1);

@@ -10,7 +10,7 @@ constexpr double kInteriorWallFraction = 0.1;
 
 }  // namespace
 
-GridMap::GridMap() : width(12), height(12) {
+GridMap::GridMap() {
     resetDefault();
 }
 

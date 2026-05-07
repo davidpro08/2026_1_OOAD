@@ -33,8 +33,8 @@ public:
     std::vector<std::string> render(Point robot, Point direction) const;
 
 private:
-    int width;
-    int height;
+    int width = 12;
+    int height = 12;
     std::vector<std::vector<CellType>> cells;
 
     void fillBorderWalls();

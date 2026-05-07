@@ -12,7 +12,7 @@ RvcSimulator::RvcSimulator()
       rightSensor(&map, &motor, SensorDirection::Right),
       dustSensor(&map, &motor, SensorDirection::Dust),
       cleaner(&map, &motor),
-      sensorController(&bus, &frontSensor, &leftSensor, &rightSensor, &dustSensor),
+      sensorController(&bus, &leftSensor, &rightSensor, &dustSensor),
       cleanerController(&bus, &cleaner),
       motorController(&bus, motor),
       powerController(&bus),

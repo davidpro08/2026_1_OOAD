@@ -8,8 +8,6 @@
 //  @ Author : 
 //
 //
-#include <iostream>
-
 #include "MotorController.h"
 #include "SensorController.h"
 #include "HDWARE/Motor.h"
@@ -17,9 +15,9 @@
 MotorController::MotorController(EventBus* bus, Motor& motor)
     : bus(bus), motor(motor), isTurnOn(false) {
 
-    // bus->subScribeStartCleaning([this]() {
-    //     this->MCMove();
-    // });
+    bus->subScribeStartCleaning([this]() {
+        this->turnOn();
+    });
     bus->subScribeAvoidObstacle([this](SensorProvider* sensor) {
         this->AvoidObstacle(*sensor);
     });
@@ -57,7 +55,7 @@ void MotorController::AvoidObstacle(SensorProvider& provider) {
     }
 }
 void MotorController::MCStop() {
-    //motor.stop();
+    motor.stop();
 }
 
 void MotorController::MCMove() {
@@ -72,27 +70,6 @@ void MotorController::MCMove() {
         return;
     }
 }
-
-// void MotorController::MCMove(SensorProvider& provider) {
-//     if(!avoiding) {
-//         motor.moveForward();
-//         return;
-//     }
-//     else{
-//         if(provider.getLeftState() && provider.getRightState() ) {
-//             MCMoveBackward();
-//         }
-//         if(provider.getRightState() == false) {
-//             MCTurnRight();
-//             avoiding = false;
-//             bus->publishStartCleaning();
-//         }else if(provider.getLeftState() == false){
-//             MCTurnLeft();
-//             avoiding = false;
-//             bus->publishStartCleaning();
-//         }
-//     }
-// }
 
 void MotorController::MCTurnLeft() {
     motor.turnLeft();

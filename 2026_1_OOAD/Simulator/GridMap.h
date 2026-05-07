@@ -40,4 +40,8 @@ private:
     void fillBorderWalls();
     void setWall(Point point);
     void setDust(Point point);
+
+    static char robotSymbol(Point direction);
+    static char cellSymbol(CellType cell);
+    std::string renderRow(int y, Point robot, Point direction) const;
 };

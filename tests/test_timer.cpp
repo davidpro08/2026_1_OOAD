@@ -9,32 +9,29 @@
 
 #include <gtest/gtest.h>
 
-//Timer�� ��ӹ��� testClass ����(private���� Ȯ���ϱ� ����)
 
-//setTimer �� current_time ��ȭ Ȯ��
 TEST(TimerTest, setTimerCurrentTimeCheck) {
     Timer testTimer;
         
     EXPECT_EQ(testTimer.getCurrent_Time(), 0);
     testTimer.setTimer(3, NULL);
     EXPECT_GT(testTimer.getCurrent_Time(), 0);
-    std::this_thread::sleep_for(std::chrono::seconds(4));   //3�ʵ� powerDown
+    std::this_thread::sleep_for(std::chrono::seconds(4));   
     EXPECT_EQ(testTimer.getCurrent_Time(), 0);
 }
 
-//setTimer �� Thread ���� Ȯ��
+
 TEST(TimerTest, TimerThreadCreateCheck) {
     Timer testTimer;
 
     testTimer.setTimer(3, NULL);
     EXPECT_EQ(testTimer.getWorkerRunning(), true);
-    std::this_thread::sleep_for(std::chrono::seconds(1));   //1�ʵڱ��� thread ����
+    std::this_thread::sleep_for(std::chrono::seconds(1));   
     EXPECT_EQ(testTimer.getWorkerRunning(), true);
-    std::this_thread::sleep_for(std::chrono::seconds(3));   //3�ʵ� thread join
+    std::this_thread::sleep_for(std::chrono::seconds(3));   
     EXPECT_EQ(testTimer.getWorkerRunning(), false);
 }
 
-//setTimer �� DoTimer ���� Ȯ��
 TEST(TimerTest, DoTimerExecutionCheck) {
     Timer testTimer;
 
@@ -47,7 +44,7 @@ TEST(TimerTest, DoTimerExecutionCheck) {
     EXPECT_EQ(testTimer.getCurrent_Time(), 0);
 }
 
-//setTimer�� �����Լ� ���� ���� Ȯ��
+//setTimer
 /*
 TEST(TimerTest, LamdaOutputExecutionCheck) {
     Timer testTimer;
@@ -68,18 +65,16 @@ TEST(TimerTest, LamdaOutputExecutionCheck) {
     EXPECT_EQ(test_count, 4);
 }*/
 
-//�̹� Thread�� ������ SetTimer�� Current_Time ��ȭ Ȯ��
 TEST(TimerTest, AlreadySetTimerExecutionCheck) {
     Timer testTimer;
 
     EXPECT_EQ(testTimer.getCurrent_Time(), 0);
     testTimer.setTimer(3, NULL);
-    EXPECT_GT(testTimer.getCurrent_Time(), 2000);   //Current_Time > 1000 üũ
+    EXPECT_GT(testTimer.getCurrent_Time(), 2000);   
     std::this_thread::sleep_for(std::chrono::seconds(1));
     testTimer.setTimer(5, NULL);
-    EXPECT_GT(testTimer.getCurrent_Time(), 4000);   //Current_Timer > 4000 üũ
+    EXPECT_GT(testTimer.getCurrent_Time(), 4000);   
     std::this_thread::sleep_for(std::chrono::seconds(6));
     EXPECT_EQ(testTimer.getCurrent_Time(), 0);
 }
 
-//�̹� Thread�� ������ SetTimer�� ���� Thread �������� �ʴ��� Ȯ��

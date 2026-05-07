@@ -160,15 +160,11 @@ void RvcSimulator::step() {
         sensorController.FrontObstacleDetected();
     }
     motorController.MCMove();
-<<<<<<< HEAD
     if (motorController.avoiding) {
         ++consecutiveAvoidSteps;
     } else {
         consecutiveAvoidSteps = 0;
     }
-=======
-    cleanerTimer.syncTimerDigitalClock();
->>>>>>> master
 
     sensorController.ChecknPowerUp();
     cleaner.cleanCurrentCell();

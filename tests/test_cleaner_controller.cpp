@@ -4,7 +4,7 @@
 #include "Class/SensorProvider.h"
 #include "Class/CleanerController.h"
 #include "Class/Timer.h"
-#include "Class/HwCleaner.h"
+#include "HDWARE/HwCleaner.h"
 
 #include <gtest/gtest.h>
 
@@ -27,12 +27,12 @@ public:
     }
 };
 
-//CleanerController¸¦ »ó¼Ó¹ÞÀº testClass »ý¼º(private±îÁö È®ÀÎÇÏ±â À§ÇØ)
+//CleanerControllerï¿½ï¿½ ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½ testClass ï¿½ï¿½ï¿½ï¿½(privateï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½)
 class TestCleaner : public CleanerController {
 public:
-    using CleanerController::CleanerController; // »ý¼ºÀÚ »ó¼Ó
+    using CleanerController::CleanerController; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 
-    // private(protected) º¯¼ö °ªÀ» ¹ÝÈ¯ÇÏ´Â public ¸Þ¼­µå Ãß°¡
+    // private(protected) ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Ï´ï¿½ public ï¿½Þ¼ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
     Timer& GetTimer() { return timer; }
 };
 
@@ -76,7 +76,7 @@ TEST(CleanerTest, CleanerControllerBusSubscribeCheck) {
     EXPECT_EQ(testHwCleaner.isturnOn, false);
 }
 
-//PowerUp½Ã Å¸ÀÌ¸Ó È£Ãâ Check
+//PowerUpï¿½ï¿½ Å¸ï¿½Ì¸ï¿½ È£ï¿½ï¿½ Check
 TEST(CleanerTest, WhenPowerUpTimerCallingCheck) {
     EventBus bus;
     FakeHwCleaner testHwCleaner;
@@ -87,7 +87,7 @@ TEST(CleanerTest, WhenPowerUpTimerCallingCheck) {
     EXPECT_GT(t.getCurrent_Time(), 0);
 }
 
-//Hw ¿¬°á
+//Hw ï¿½ï¿½ï¿½ï¿½
 TEST(CleanerTest, CleanerHwConnectCheck) {
     EventBus bus;
     FakeHwCleaner testHwCleaner;
@@ -104,16 +104,16 @@ TEST(CleanerTest, CleanerHwConnectCheck) {
     EXPECT_EQ(testHwCleaner.ispowerUp, false);
 }
 
-//PowerUp½Ã°£ Á¾·á½Ã Restore Check
+//PowerUpï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ Restore Check
 TEST(CleanerTest, PowerRestoreCheck) {
     EventBus bus;
     FakeHwCleaner testHwCleaner;
     TestCleaner myTestCleaner(&bus, &testHwCleaner);
     myTestCleaner.CCpowerUp();
     EXPECT_EQ(testHwCleaner.ispowerUp, true);
-    std::this_thread::sleep_for(std::chrono::seconds(3));   //3ÃÊ±îÁö´Â powerup
+    std::this_thread::sleep_for(std::chrono::seconds(3));   //3ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ powerup
     EXPECT_EQ(testHwCleaner.ispowerUp, true);
-    std::this_thread::sleep_for(std::chrono::seconds(3));   //6ÃÊ¿¡´Â powerRestore
+    std::this_thread::sleep_for(std::chrono::seconds(3));   //6ï¿½Ê¿ï¿½ï¿½ï¿½ powerRestore
     EXPECT_EQ(testHwCleaner.ispowerUp, false);
 }
 

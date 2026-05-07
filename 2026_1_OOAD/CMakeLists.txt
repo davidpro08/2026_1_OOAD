@@ -12,6 +12,8 @@ file(GLOB SRC_LIST
     "Class/*.h"
     "HDWARE/*.cpp"
     "HDWARE/*.h"
+    "Simulator/*.cpp"
+    "Simulator/*.h"
 )
 
 add_library(OOAD_Lib STATIC
@@ -21,12 +23,17 @@ add_library(OOAD_Lib STATIC
 target_include_directories(OOAD_Lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # 이 프로젝트의 실행 파일 생성
-add_executable(2026_1_OOAD main.cpp  "Class/HwCleaner.h") 
+add_executable(2026_1_OOAD main.cpp)
 target_link_libraries(2026_1_OOAD PRIVATE OOAD_Lib)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_target_properties(OOAD_Lib PROPERTIES CXX_STANDARD 20)
   set_target_properties(2026_1_OOAD PROPERTIES CXX_STANDARD 20)
+endif()
+
+if(MSVC)
+  target_compile_options(OOAD_Lib PRIVATE /utf-8)
+  target_compile_options(2026_1_OOAD PRIVATE /utf-8)
 endif()
 
 if(CPPCHECK_PATH)

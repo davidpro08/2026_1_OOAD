@@ -3,7 +3,7 @@
 #include "Class/SensorController.h"
 #include "Class/SensorProvider.h"
 #include "Class/ISensor.h"
-#include "Class/Motor.h"
+#include "HDWARE/Motor.h"
 
 #include <gtest/gtest.h>
 #include <memory>
@@ -51,8 +51,10 @@ public:
     };
 
     class FakeMotor : public Motor {
-
     public:
+        Point point = Point(0, 0);
+        Point direction = Point(0, 1);
+
         int stopCount = 0;
         int forwardCount = 0;
         int backwardCount = 0;

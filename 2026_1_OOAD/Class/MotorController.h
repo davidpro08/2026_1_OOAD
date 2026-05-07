@@ -24,15 +24,14 @@ public:
 	void turnOn();
 	void turnOff() override;
 	void AvoidObstacle(SensorProvider& provider);
-	void MCStop();
+	void MCStop();	bool avoiding =false;
+	void MCMove();
+
 private:
 	EventBus* bus;
-	SensorProvider mySensor;
+	SensorProvider* mySensor = nullptr;
 	Motor& motor;
-	bool avoiding =false;
 	bool isTurnOn;
-	void MCMove();
-	void MCMove(SensorProvider& provider);
 	void MCTurnLeft();
 	void MCTurnRight();
 	void MCMoveBackward();

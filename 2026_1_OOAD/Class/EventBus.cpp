@@ -20,7 +20,7 @@ void EventBus::subScribeStartCleaning(startCleaningCallBack cb) {
     startCleaningSubs.push_back(cb);
 }
 
-void EventBus::publishAvoidObstacle(SensorController* sender) {
+void EventBus::publishAvoidObstacle(SensorProvider* sender) {
     for (auto& cb : avoidObstacleSubs) cb(sender);
 }
 

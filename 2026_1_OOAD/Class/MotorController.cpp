@@ -8,7 +8,7 @@
 //  @ Author : 
 //
 //
-
+#include <iostream>
 
 #include "MotorController.h"
 #include "SensorController.h"
@@ -17,75 +17,82 @@
 MotorController::MotorController(EventBus* bus, Motor& motor)
     : bus(bus), motor(motor), isTurnOn(false) {
 
-    bus->subScribeStartCleaning([this]() {
-        this->MCMove();
-    });
-    bus->subScribeAvoidObstacle([this](SensorController* sensor) {
+    // bus->subScribeStartCleaning([this]() {
+    //     this->MCMove();
+    // });
+    bus->subScribeAvoidObstacle([this](SensorProvider* sensor) {
         this->AvoidObstacle(*sensor);
     });
 }
 
 void MotorController::turnOn() {
     isTurnOn = true;
+    avoiding = false;
 }
 
 void MotorController::turnOff() {
     isTurnOn = false;
+    avoiding = false;
+    mySensor = nullptr;
 }
 
 void MotorController::AvoidObstacle(SensorProvider& provider) {
-    if(isTurnOn == false&&!avoiding) {
+    mySensor = &provider;
+    if(isTurnOn == false) {
         return;
 	}
 
-    // 모터 멈춤
-    MCStop();
 
-    // SensorProvider mySensor 인터페이스를 사용해서 왼쪽 오른쪽 상태 받아오기
     if(provider.getRightState() == false) {
         MCTurnRight();
+        avoiding = false;
+        bus->publishStartCleaning();
     }else if(provider.getLeftState() == false){
         MCTurnLeft();
+        avoiding = false;
+        bus->publishStartCleaning();
     }else{
-            MCMoveBackward();
-            avoiding = true;
-            
-        }
-
-        
+        avoiding = true;
+        // No exit yet: next tick should be another backward tick.
     }
-
+}
 void MotorController::MCStop() {
-    motor.stop();
+    //motor.stop();
 }
 
 void MotorController::MCMove() {
     if(!avoiding) {
         motor.moveForward();
         return;
+    }else{
+        if (mySensor != nullptr) {
+            motor.moveBackward();
+            bus->publishAvoidObstacle(mySensor);
+        }
+        return;
     }
 }
 
-void MotorController::MCMove(SensorProvider& provider) {
-    if(!avoiding) {
-        motor.moveForward();
-        return;
-    }
-    else{
-        if(provider.getLeftState() && provider.getRightState() ) {
-            MCMoveBackward();
-        }
-        if(provider.getRightState() == false) {
-            MCTurnRight();
-            avoiding = false;
-            bus->publishStartCleaning();
-        }else if(provider.getLeftState() == false){
-            MCTurnLeft();
-            avoiding = false;
-            bus->publishStartCleaning();
-        }
-    }
-}
+// void MotorController::MCMove(SensorProvider& provider) {
+//     if(!avoiding) {
+//         motor.moveForward();
+//         return;
+//     }
+//     else{
+//         if(provider.getLeftState() && provider.getRightState() ) {
+//             MCMoveBackward();
+//         }
+//         if(provider.getRightState() == false) {
+//             MCTurnRight();
+//             avoiding = false;
+//             bus->publishStartCleaning();
+//         }else if(provider.getLeftState() == false){
+//             MCTurnLeft();
+//             avoiding = false;
+//             bus->publishStartCleaning();
+//         }
+//     }
+// }
 
 void MotorController::MCTurnLeft() {
     motor.turnLeft();

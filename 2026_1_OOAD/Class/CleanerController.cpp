@@ -22,7 +22,7 @@ CleanerController::CleanerController(EventBus* bus, HwCleaner* cleaner) {
     bus->subScribeDetectedDust([this]() {
         this->CCpowerUp();
         });
-    bus->subScribeAvoidObstacle([this](SensorController *sensor) {
+    bus->subScribeAvoidObstacle([this](SensorProvider *sensor) {
         this->turnOff();
         });
     bus->subScribeTurnOff([this]() {

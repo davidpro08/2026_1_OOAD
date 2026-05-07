@@ -16,18 +16,18 @@
 #include <vector>
 #include <functional>
 
-class SensorController;
+class SensorProvider;
 
 class EventBus {
 public:
 	using startCleaningCallBack = std::function<void()>;
-	using avoidObstacleCallBack = std::function<void(SensorController* sender)>;
+	using avoidObstacleCallBack = std::function<void(SensorProvider* sender)>;
 	using detectDustCallBack = std::function<void()>;
 	using turnOffCallBack = std::function<void()>;
 
 	void publishStartCleaning();
 	void subScribeStartCleaning(startCleaningCallBack cb);
-	void publishAvoidObstacle(SensorController* sender);
+	void publishAvoidObstacle(SensorProvider* sender);
 	void subScribeAvoidObstacle(avoidObstacleCallBack cb);
 	void publishDetectedDust();
 	void subScribeDetectedDust(detectDustCallBack cb);

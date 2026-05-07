@@ -5,8 +5,8 @@
 
 namespace {
 
-constexpr int kRandomDustCells = 6;
-constexpr double kInteriorWallFraction = 0.12;
+constexpr int kRandomDustCells = 10;
+constexpr double kInteriorWallFraction = 0.1;
 
 }  // namespace
 
@@ -30,9 +30,6 @@ void GridMap::resetDefault() {
 
     fillBorderWalls();
 
-    setWall(Point(4, 2));
-    setWall(Point(4, 3));
-    setWall(Point(4, 4));
     setWall(Point(2, 2));
     setWall(Point(2, 3));
     setWall(Point(2, 4));
@@ -43,17 +40,26 @@ void GridMap::resetDefault() {
     setWall(Point(2, 9));
     setWall(Point(2, 10));
     setWall(Point(3, 4));
-    setWall(Point(7, 5));
-    setWall(Point(8, 5));
     setWall(Point(3, 8));
+    setWall(Point(4, 2));
+    setWall(Point(4, 3));
+    setWall(Point(4, 4));
     setWall(Point(4, 8));
+    setWall(Point(5, 8));
+    setWall(Point(6, 8));
+    setWall(Point(7, 5));
+    setWall(Point(7, 8));
+    setWall(Point(8, 5));
+    setWall(Point(9, 8));
+    setWall(Point(9, 9));
 
     setDust(Point(2, 2));
-    setDust(Point(6, 3));
-    setDust(Point(9, 4));
     setDust(Point(2, 7));
-    setDust(Point(8, 8));
     setDust(Point(5, 9));
+    setDust(Point(6, 3));
+    setDust(Point(8, 8));
+    setDust(Point(9, 4));
+    setDust(Point(9, 9));
 }
 
 void GridMap::resetRandom(uint32_t seed) {

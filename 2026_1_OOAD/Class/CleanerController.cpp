@@ -16,13 +16,13 @@
 const int PowerUpDuration = 5; // 파워업 지속 시간 (초)
 
 CleanerController::CleanerController(EventBus* bus, HwCleaner* cleaner) {
-    bus->subScribeMoveForward([this]() {
+    bus->subScribeStartCleaning([this]() {
             this->turnOn();
         });
     bus->subScribeDetectedDust([this]() {
         this->CCpowerUp();
         });
-    bus->subScribeAvoidObstacle([this](SensorController *sensor) {
+    bus->subScribeAvoidObstacle([this](SensorProvider *sensor) {
         this->turnOff();
         });
     bus->subScribeTurnOff([this]() {

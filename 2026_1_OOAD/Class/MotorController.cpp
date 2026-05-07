@@ -8,8 +8,6 @@
 //  @ Author : 
 //
 //
-
-
 #include "MotorController.h"
 #include "SensorController.h"
 #include "HDWARE/Motor.h"
@@ -17,57 +15,60 @@
 MotorController::MotorController(EventBus* bus, Motor& motor)
     : bus(bus), motor(motor), isTurnOn(false) {
 
-    bus->subScribeMoveForward([this]() {
-        this->MCMoveForward();
+    bus->subScribeStartCleaning([this]() {
+        this->turnOn();
     });
-    bus->subScribeAvoidObstacle([this](SensorController* sensor) {
+    bus->subScribeAvoidObstacle([this](SensorProvider* sensor) {
         this->AvoidObstacle(*sensor);
     });
 }
 
 void MotorController::turnOn() {
     isTurnOn = true;
+    avoiding = false;
 }
 
 void MotorController::turnOff() {
     isTurnOn = false;
+    avoiding = false;
+    mySensor = nullptr;
 }
 
 void MotorController::AvoidObstacle(SensorProvider& provider) {
+    mySensor = &provider;
     if(isTurnOn == false) {
         return;
 	}
 
-    // 모터 멈춤
-    MCStop();
 
-    // SensorProvider mySensor 인터페이스를 사용해서 왼쪽 오른쪽 상태 받아오기
     if(provider.getRightState() == false) {
         MCTurnRight();
+        avoiding = false;
+        bus->publishStartCleaning();
     }else if(provider.getLeftState() == false){
         MCTurnLeft();
+        avoiding = false;
+        bus->publishStartCleaning();
     }else{
-        int retry_limit = 100; 
-        MCMoveBackward();
-        while (provider.getLeftState() && provider.getRightState() && --retry_limit > 0) {
-            MCMoveBackward();
-        }
-        if(provider.getRightState() == false) {
-            MCTurnRight();
-        }else if(provider.getLeftState() == false){
-            MCTurnLeft();
-        }
+        avoiding = true;
+        // No exit yet: next tick should be another backward tick.
     }
-
-    bus->publishMoveForward();
 }
-
 void MotorController::MCStop() {
     motor.stop();
 }
 
-void MotorController::MCMoveForward() {
-    motor.moveForward();
+void MotorController::MCMove() {
+    if(!avoiding) {
+        motor.moveForward();
+        return;
+    }else{
+        if (mySensor != nullptr) {
+            motor.moveBackward();
+            bus->publishAvoidObstacle(mySensor);
+        }
+        return;
+    }
 }
 
 void MotorController::MCTurnLeft() {

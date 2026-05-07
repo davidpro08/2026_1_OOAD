@@ -42,7 +42,7 @@ TEST_F(SensorControllerTest, TestTurnOff) {
 TEST_F(SensorControllerTest, TestFrontObstacleDetectedTrue) {
     bool isAvoidObstacleCalled = false;
 
-    bus.subScribeAvoidObstacle([&isAvoidObstacleCalled](SensorController* sender) {
+    bus.subScribeAvoidObstacle([&isAvoidObstacleCalled](SensorProvider* sender) {
         isAvoidObstacleCalled = true;
     });
 

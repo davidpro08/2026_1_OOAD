@@ -21,10 +21,10 @@ SensorController::SensorController(EventBus* bus, ISensor* leftSensor, ISensor* 
     this->dustSensor = dustSensor;
     isTurnOn = false;
     doCheck = false;
-    bus->subScribeMoveForward([this]() {
+    bus->subScribeStartCleaning([this]() {
         this->doDustCheck();
         });
-    bus->subScribeAvoidObstacle([this](SensorController* sensor) {
+    bus->subScribeAvoidObstacle([this](SensorProvider* sensor) {
         this->stopDustCheck();
         });
     // 센서를 배열로 받아야하나? 근데 그럼 기능별로 어떻게 구분하지? 일단은 그냥 개별적으로 해둠

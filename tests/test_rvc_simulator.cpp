@@ -11,7 +11,7 @@ TEST(RvcSimulatorTest, StepMovesForwardWhenFrontIsEmpty) {
     simulator.turnOn();
     simulator.step();
 
-    EXPECT_TRUE(simulator.getRobotPoint().isEqual(Point(1, 3)));
+    EXPECT_TRUE(simulator.getRobotPoint().isEqual(Point(1, 2)));
     EXPECT_TRUE(simulator.isCleanerOn());
 }
 
@@ -29,7 +29,7 @@ TEST(RvcSimulatorTest, StepMovesForwardWhenFrontIsEmpty) {
 TEST(RvcSimulatorTest, DustTriggersPowerUpAndTimerRestoresPower) {
     RvcSimulator simulator;
 
-    simulator.addDust(1, 3);
+    simulator.addDust(1, 2);
     simulator.turnOn();
     simulator.step();
 
@@ -42,5 +42,5 @@ TEST(RvcSimulatorTest, AutoStepRunsRequestedTicks) {
     simulator.turnOn();
     simulator.autoStep(3);
 
-    EXPECT_TRUE(simulator.getRobotPoint().isEqual(Point(1, 5)));
+    EXPECT_TRUE(simulator.getRobotPoint().isEqual(Point(1, 4)));
 }

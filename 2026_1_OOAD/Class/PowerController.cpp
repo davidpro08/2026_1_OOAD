@@ -20,7 +20,7 @@ PowerController::PowerController(EventBus *bus)
 void PowerController::turnOn()
 {
     power = true;
-    bus->publishMoveForward();
+    bus->publishStartCleaning();
 }
 
 void PowerController::turnOff() {

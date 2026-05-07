@@ -67,6 +67,7 @@ void RvcSimulator::turnOn() {
     powerController.turnOn();
     sensorController.ChecknPowerUp();
     cleaner.cleanCurrentCell();
+    bus.publishStartCleaning();
 }
 
 void RvcSimulator::turnOff() {
@@ -87,11 +88,10 @@ void RvcSimulator::step() {
     }
 
     motor.clearBlocked();
-    if (frontSensor.detect()) {
+    if (frontSensor.detect() && !motorController.avoiding) {
         sensorController.FrontObstacleDetected();
-    } else {
-        bus.publishMoveForward();
     }
+    motorController.MCMove();
 
     sensorController.ChecknPowerUp();
     cleaner.cleanCurrentCell();

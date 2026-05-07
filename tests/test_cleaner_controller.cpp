@@ -4,7 +4,7 @@
 #include "Class/SensorProvider.h"
 #include "Class/CleanerController.h"
 #include "Class/Timer.h"
-#include "Class/HwCleaner.h"
+#include "HDWARE/HwCleaner.h"
 
 #include <gtest/gtest.h>
 

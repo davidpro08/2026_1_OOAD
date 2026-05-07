@@ -16,7 +16,7 @@
 #include "IPower.h"
 #include "SensorProvider.h"
 #include "EventBus.h"
-#include "Motor.h"
+#include "HDWARE/Motor.h"
 
 class MotorController : public IPower {
 public:

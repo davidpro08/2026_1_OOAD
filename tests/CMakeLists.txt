@@ -13,6 +13,7 @@ add_executable(unit_tests ${TEST_SRCS})
 
 if(MSVC)
     target_link_options(unit_tests PRIVATE /DEBUG)
+    target_compile_options(unit_tests PRIVATE /utf-8)
 endif()
 
 target_link_libraries(unit_tests PRIVATE OOAD_Lib GTest::gtest_main)

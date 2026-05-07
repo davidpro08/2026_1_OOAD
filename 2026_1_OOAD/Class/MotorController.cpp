@@ -12,7 +12,7 @@
 
 #include "MotorController.h"
 #include "SensorController.h"
-#include "Motor.h"
+#include "HDWARE/Motor.h"
 
 MotorController::MotorController(EventBus* bus, Motor& motor)
     : bus(bus), motor(motor), isTurnOn(false) {

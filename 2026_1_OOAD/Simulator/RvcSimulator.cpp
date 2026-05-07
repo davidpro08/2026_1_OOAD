@@ -1,4 +1,5 @@
 #include "Simulator/RvcSimulator.h"
+#include "Simulator/SystemTestMode.h"
 
 #include <chrono>
 #include <iostream>
@@ -16,7 +17,9 @@ RvcSimulator::RvcSimulator()
       cleanerController(&bus, &cleaner),
       motorController(&bus, motor),
       powerController(&bus),
-      powerOn(false) {
+      powerOn(false),
+      autoStepSleepEnabled(true),
+      consecutiveAvoidSteps(0) {
 }
 
 RvcSimulator::~RvcSimulator() {
@@ -24,6 +27,31 @@ RvcSimulator::~RvcSimulator() {
 }
 
 void RvcSimulator::run() {
+    while (true) {
+        std::cout << "\n===== RVC Simulator =====\n";
+        std::cout << "1. 기본 모드\n";
+        std::cout << "2. 테스트 모드\n";
+        std::cout << "3. 종료\n";
+        std::cout << "선택> ";
+
+        std::string line;
+        if (!std::getline(std::cin, line)) {
+            return;
+        }
+
+        if (line == "1") {
+            runFreeMode();
+        } else if (line == "2") {
+            RunSystemTestMode(*this);
+        } else if (line == "3" || line == "q" || line == "quit") {
+            return;
+        } else {
+            std::cout << "잘못된 입력입니다.\n";
+        }
+    }
+}
+
+void RvcSimulator::runFreeMode() {
     std::cout << "RVC CLI 격자 시뮬레이터\n";
     printHelp();
     printScreen();
@@ -46,6 +74,12 @@ void RvcSimulator::reset() {
     motor.resetPose(Point(1, 1), Point(0, 1));
     cleaner.reset();
     powerOn = false;
+    setSensorFault(SensorDirection::Front, SimulatedSensor::FaultMode::Normal);
+    setSensorFault(SensorDirection::Left, SimulatedSensor::FaultMode::Normal);
+    setSensorFault(SensorDirection::Right, SimulatedSensor::FaultMode::Normal);
+    setSensorFault(SensorDirection::Dust, SimulatedSensor::FaultMode::Normal);
+    setMotorBroken(false);
+    consecutiveAvoidSteps = 0;
 }
 
 void RvcSimulator::resetRandomMap(uint32_t seed) {
@@ -92,6 +126,11 @@ void RvcSimulator::step() {
         sensorController.FrontObstacleDetected();
     }
     motorController.MCMove();
+    if (motorController.avoiding) {
+        ++consecutiveAvoidSteps;
+    } else {
+        consecutiveAvoidSteps = 0;
+    }
 
     sensorController.ChecknPowerUp();
     cleaner.cleanCurrentCell();
@@ -105,7 +144,9 @@ void RvcSimulator::autoStep(int count) {
     for (int i = 0; i < count; ++i) {
         step();
         printScreen();
-        std::this_thread::sleep_for(std::chrono::milliseconds(150));
+        if (autoStepSleepEnabled) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(150));
+        }
     }
 }
 
@@ -172,6 +213,42 @@ bool RvcSimulator::isCleanerOn() const {
 
 bool RvcSimulator::isPowerUp() const {
     return cleaner.isPowerUp();
+}
+
+bool RvcSimulator::isAvoiding() const {
+    return motorController.avoiding;
+}
+
+int RvcSimulator::getConsecutiveAvoidSteps() const {
+    return consecutiveAvoidSteps;
+}
+
+bool RvcSimulator::isWallAt(int x, int y) const {
+    return map.isWall(Point(x, y));
+}
+
+void RvcSimulator::setSensorFault(SensorDirection direction, SimulatedSensor::FaultMode mode) {
+    if (direction == SensorDirection::Front) {
+        frontSensor.setFaultMode(mode);
+    } else if (direction == SensorDirection::Left) {
+        leftSensor.setFaultMode(mode);
+    } else if (direction == SensorDirection::Right) {
+        rightSensor.setFaultMode(mode);
+    } else {
+        dustSensor.setFaultMode(mode);
+    }
+}
+
+void RvcSimulator::setMotorBroken(bool broken) {
+    motor.setBroken(broken);
+}
+
+bool RvcSimulator::isMotorBlocked() const {
+    return motor.wasBlocked();
+}
+
+void RvcSimulator::setAutoStepSleepEnabled(bool enabled) {
+    autoStepSleepEnabled = enabled;
 }
 
 void RvcSimulator::printScreen() const {

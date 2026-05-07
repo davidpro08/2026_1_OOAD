@@ -37,6 +37,13 @@ public:
     bool isPowerOn() const;
     bool isCleanerOn() const;
     bool isPowerUp() const;
+    bool isAvoiding() const;
+    int getConsecutiveAvoidSteps() const;
+    bool isWallAt(int x, int y) const;
+    void setSensorFault(SensorDirection direction, SimulatedSensor::FaultMode mode);
+    void setMotorBroken(bool broken);
+    bool isMotorBlocked() const;
+    void setAutoStepSleepEnabled(bool enabled);
 
 private:
     GridMap map;
@@ -52,9 +59,12 @@ private:
     MotorController motorController;
     PowerController powerController;
     bool powerOn;
+    bool autoStepSleepEnabled;
+    int consecutiveAvoidSteps;
 
     void printScreen() const;
     void printHelp() const;
     bool handleCommand(const std::string& line);
     std::string directionText() const;
+    void runFreeMode();
 };

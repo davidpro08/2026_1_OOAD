@@ -16,7 +16,8 @@
 
 class IPower {
 public:
-	virtual void turnOff();
+	virtual ~IPower() = default;
+	virtual void turnOff() = 0;
 };
 
 #endif  //_IPOWER_H

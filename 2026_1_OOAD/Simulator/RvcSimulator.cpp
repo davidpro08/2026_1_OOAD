@@ -29,7 +29,7 @@ RvcSimulator::RvcSimulator()
       dustSensor(&map, &motor, SensorDirection::Dust),
       cleaner(&map, &motor),
       sensorController(&bus, &leftSensor, &rightSensor, &dustSensor),
-      cleanerController(&bus, &cleaner),
+      cleanerController(&bus, &cleaner, &cleanerTimer),
       motorController(&bus, motor),
       powerController(&bus),
       powerOn(false),
@@ -156,15 +156,19 @@ void RvcSimulator::step() {
     }
 
     motor.clearBlocked();
-    if (frontSensor.detect() && !motorController.avoiding) {
+    if (frontSensor.detect() && !motorController.isAvoiding()) {
         sensorController.FrontObstacleDetected();
     }
     motorController.MCMove();
+<<<<<<< HEAD
     if (motorController.avoiding) {
         ++consecutiveAvoidSteps;
     } else {
         consecutiveAvoidSteps = 0;
     }
+=======
+    cleanerTimer.syncTimerDigitalClock();
+>>>>>>> master
 
     sensorController.ChecknPowerUp();
     cleaner.cleanCurrentCell();

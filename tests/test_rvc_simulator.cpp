@@ -34,6 +34,24 @@ TEST(RvcSimulatorTest, DustTriggersPowerUpAndTimerRestoresPower) {
     simulator.step();
 
     EXPECT_TRUE(simulator.isPowerUp());
+
+    for (int i = 0; i < 5; ++i) {
+        simulator.step();
+    }
+
+    EXPECT_FALSE(simulator.isPowerUp());
+}
+
+TEST(RvcSimulatorTest, TurnOffStopsCleaner) {
+    RvcSimulator simulator;
+
+    simulator.turnOn();
+    ASSERT_TRUE(simulator.isCleanerOn());
+
+    simulator.turnOff();
+
+    EXPECT_FALSE(simulator.isPowerOn());
+    EXPECT_FALSE(simulator.isCleanerOn());
 }
 
 TEST(RvcSimulatorTest, AutoStepRunsRequestedTicks) {

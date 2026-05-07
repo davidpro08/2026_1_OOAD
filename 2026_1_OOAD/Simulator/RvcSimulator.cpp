@@ -160,7 +160,7 @@ void RvcSimulator::step() {
         sensorController.FrontObstacleDetected();
     }
     motorController.MCMove();
-    if (motorController.avoiding) {
+    if (motorController.isAvoiding()) {
         ++consecutiveAvoidSteps;
     } else {
         consecutiveAvoidSteps = 0;
@@ -254,7 +254,7 @@ bool RvcSimulator::isPowerUp() const {
 }
 
 bool RvcSimulator::isAvoiding() const {
-    return motorController.avoiding;
+    return motorController.isAvoiding();
 }
 
 int RvcSimulator::getConsecutiveAvoidSteps() const {

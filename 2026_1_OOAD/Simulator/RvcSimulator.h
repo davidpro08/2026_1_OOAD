@@ -48,8 +48,8 @@ private:
     SimulatedSensor dustSensor;
     SimulatedCleaner cleaner;
     SensorController sensorController;
-    MotorController motorController;
     CleanerController cleanerController;
+    MotorController motorController;
     PowerController powerController;
     bool powerOn;
 

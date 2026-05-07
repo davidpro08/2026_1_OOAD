@@ -168,6 +168,7 @@ void RvcSimulator::step() {
 
     sensorController.ChecknPowerUp();
     cleaner.cleanCurrentCell();
+    cleanerTimer.syncTimerDigitalClock();
 
     if (stepTraceEnabled) {
         printScreen();

@@ -231,31 +231,72 @@ std::vector<SystemTestCase> BuildSystemTestCases() {
         sim.turnOn(); sim.step();
         return {!sim.isPowerUp(), "Dust가 있어도 always-zero 고장 반응이 안 보임"};
     });
-    AddCase(cases, 24, "Negative", "맵 경계 밖 좌표", s24, [](RvcSimulator& sim) -> SystemTestResult {
-        return {!sim.addDust(100, 100) && !sim.toggleWall(100, 100), "맵 경계 밖 좌표"};
+    AddCase(cases, 24, "Negative", "음수 좌표 입력 거부", s24, [](RvcSimulator& sim) -> SystemTestResult {
+        const bool dustRejected = !sim.addDust(-1, -1);
+        const bool wallRejected = !sim.toggleWall(-1, -1);
+        return {dustRejected && wallRejected, "음수 좌표가 허용됨"};
     });
-    AddCase(cases, 25, "Negative", "정의되지 않은 맵 값 입력", s25, [](RvcSimulator&) -> SystemTestResult {
-        return {true, "현재 맵 파서 미구현"};
+    AddCase(cases, 25, "Negative", "맵 경계 밖 좌표 입력 거부", s25, [](RvcSimulator& sim) -> SystemTestResult {
+        const bool dustRejected = !sim.addDust(100, 100);
+        const bool wallRejected = !sim.toggleWall(100, 100);
+        return {dustRejected && wallRejected, "맵 경계 밖 좌표가 허용됨"};
     });
-    AddCase(cases, 26, "Negative", "시작 위치 장애물 위 입력", s26, [](RvcSimulator& sim) -> SystemTestResult {
-        sim.toggleWall(1, 1);
-        return {!sim.isWallAt(1, 1), "시작 위치 장애물 위"};
+    AddCase(cases, 26, "Negative", "시작 위치가 벽이면 로드 실패", s26, [](RvcSimulator& sim) -> SystemTestResult {
+        const std::vector<std::string> rows = {
+            "#####",
+            "#...#",
+            "#.#.#",
+            "#...#",
+            "#####"
+        };
+        const bool loaded = sim.loadSystemTestScenario(rows, Point(2, 2), Point(0, 1));
+        return {!loaded, "벽 위 시작 위치가 허용됨"};
     });
-    AddCase(cases, 27, "Negative", "Tick 주기 0/음수", s27, [](RvcSimulator& sim) -> SystemTestResult {
-        sim.turnOn(); const Point p = sim.getRobotPoint(); sim.autoStep(-1);
-        return {SamePoint(p, sim.getRobotPoint()), "Tick 주기 0/음수"};
+    AddCase(cases, 27, "Negative", "시작 위치가 맵 밖이면 로드 실패", s27, [](RvcSimulator& sim) -> SystemTestResult {
+        const std::vector<std::string> rows = {
+            "#####",
+            "#...#",
+            "#...#",
+            "#...#",
+            "#####"
+        };
+        const bool loaded = sim.loadSystemTestScenario(rows, Point(5, 5), Point(0, 1));
+        return {!loaded, "맵 밖 시작 위치가 허용됨"};
     });
-    AddCase(cases, 28, "Negative", "명령 큐 비었을때 idle", s28, [](RvcSimulator& sim) -> SystemTestResult {
-        sim.turnOn(); const Point p = sim.getRobotPoint();
-        return {SamePoint(p, sim.getRobotPoint()), "명령 큐 비었을때 idle"};
+    AddCase(cases, 28, "Negative", "행 길이 불일치 맵 입력 거부", s28, [](RvcSimulator& sim) -> SystemTestResult {
+        const std::vector<std::string> rows = {
+            "#####",
+            "#...#",
+            "#..#",
+            "#####"
+        };
+        const bool loaded = sim.loadSystemTestScenario(rows, Point(1, 1), Point(0, 1));
+        return {!loaded, "비정형 맵(행 길이 불일치)이 허용됨"};
     });
-    AddCase(cases, 29, "Negative", "동일 tick 상충 명령", s29, [](RvcSimulator& sim) -> SystemTestResult {
-        sim.turnOn(); sim.step();
-        return {sim.isPowerOn(), "동일 tick 상충 명령"};
+    AddCase(cases, 29, "Negative", "벽/먼지 동일 좌표 충돌 처리", s29, [](RvcSimulator& sim) -> SystemTestResult {
+        const Point target(3, 3);
+        const bool dustAdded = sim.addDust(target.x, target.y);
+        const bool wallToggled = sim.toggleWall(target.x, target.y);
+        const bool dustRejectedOnWall = !sim.addDust(target.x, target.y);
+        return {dustAdded && wallToggled && sim.isWallAt(target.x, target.y) && dustRejectedOnWall,
+                "벽과 먼지 충돌 처리(벽 우선/먼지 거부) 실패"};
     });
-    AddCase(cases, 30, "Negative", "장시간 시뮬레이션 안정성", s30, [](RvcSimulator& sim) -> SystemTestResult {
-        sim.turnOn(); for (int i = 0; i < 10000; ++i) sim.step();
-        return {sim.isPowerOn(), "장시간 시뮬레이션 안정성"};
+    AddCase(cases, 30, "Negative", "먼지 위 시작 위치 시나리오 처리", s30, [](RvcSimulator& sim) -> SystemTestResult {
+        const std::vector<std::string> rows = {
+            "#####",
+            "#...#",
+            "#.*.#",
+            "#...#",
+            "#####"
+        };
+        const bool loaded = sim.loadSystemTestScenario(rows, Point(2, 2), Point(0, 1));
+        if (!loaded) {
+            return {false, "먼지 위 시작 시나리오 로드 실패"};
+        }
+
+        sim.turnOn();
+        sim.step();
+        return {sim.isPowerOn(), "먼지 위 시작 후 기본 동작 유지 실패"};
     });
 
     return cases;

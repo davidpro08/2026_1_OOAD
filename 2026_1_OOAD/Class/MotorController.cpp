@@ -83,3 +83,6 @@ void MotorController::MCMoveBackward() {
     motor.moveBackward();
 }
 
+bool MotorController::isAvoiding() const {
+    return avoiding;
+}

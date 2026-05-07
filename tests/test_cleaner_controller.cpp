@@ -33,7 +33,7 @@ public:
     using CleanerController::CleanerController; // ������ ���
 
     // private(protected) ���� ���� ��ȯ�ϴ� public �޼��� �߰�
-    Timer& GetTimer() { return timer; }
+    Timer& GetTimer() { return *timer; }
 };
 
 //TurnOn,Off
@@ -78,7 +78,19 @@ TEST(CleanerTest, CleanerControllerBusSubscribeCheck) {
 
 //PowerUp�� Ÿ�̸� ȣ�� Check
 TEST(CleanerTest, WhenPowerUpTimerCallingCheck) {
-    
+    EventBus bus;
+    FakeHwCleaner testHwCleaner;
+    TestCleaner myTestCleaner(&bus, &testHwCleaner);
+
+    myTestCleaner.turnOn();
+    myTestCleaner.CCpowerUp();
+    EXPECT_TRUE(testHwCleaner.ispowerUp);
+
+    for (int i = 0; i < 5; ++i) {
+        myTestCleaner.GetTimer().syncTimerDigitalClock();
+    }
+
+    EXPECT_FALSE(testHwCleaner.ispowerUp);
 }
 
 //Hw ����

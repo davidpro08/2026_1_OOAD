@@ -5,12 +5,12 @@
 
 namespace {
 
-constexpr int kRandomDustCells = 6;
-constexpr double kInteriorWallFraction = 0.12;
+constexpr int kRandomDustCells = 10;
+constexpr double kInteriorWallFraction = 0.1;
 
 }  // namespace
 
-GridMap::GridMap() : width(12), height(12) {
+GridMap::GridMap() {
     resetDefault();
 }
 
@@ -30,9 +30,6 @@ void GridMap::resetDefault() {
 
     fillBorderWalls();
 
-    setWall(Point(4, 2));
-    setWall(Point(4, 3));
-    setWall(Point(4, 4));
     setWall(Point(2, 2));
     setWall(Point(2, 3));
     setWall(Point(2, 4));
@@ -43,17 +40,26 @@ void GridMap::resetDefault() {
     setWall(Point(2, 9));
     setWall(Point(2, 10));
     setWall(Point(3, 4));
-    setWall(Point(7, 5));
-    setWall(Point(8, 5));
     setWall(Point(3, 8));
+    setWall(Point(4, 2));
+    setWall(Point(4, 3));
+    setWall(Point(4, 4));
     setWall(Point(4, 8));
+    setWall(Point(5, 8));
+    setWall(Point(6, 8));
+    setWall(Point(7, 5));
+    setWall(Point(7, 8));
+    setWall(Point(8, 5));
+    setWall(Point(9, 8));
+    setWall(Point(9, 9));
 
     setDust(Point(2, 2));
-    setDust(Point(6, 3));
-    setDust(Point(9, 4));
     setDust(Point(2, 7));
-    setDust(Point(8, 8));
     setDust(Point(5, 9));
+    setDust(Point(6, 3));
+    setDust(Point(8, 8));
+    setDust(Point(9, 4));
+    setDust(Point(9, 9));
 }
 
 void GridMap::resetRandom(uint32_t seed) {
@@ -168,6 +174,39 @@ CellType GridMap::getCell(Point point) const {
     return cells[point.y][point.x];
 }
 
+char GridMap::robotSymbol(Point direction) {
+    // 화면이 위아래로 반전된 좌표계 기준 기호
+    if (direction.x == 0 && direction.y == -1) return 'v';
+    if (direction.x == 0 && direction.y == 1) return '^';
+    if (direction.x == -1 && direction.y == 0) return '<';
+    if (direction.x == 1 && direction.y == 0) return '>';
+    return 'R';
+}
+
+char GridMap::cellSymbol(CellType cell) {
+    switch (cell) {
+    case CellType::Wall:    return '#';
+    case CellType::Dust:    return '*';
+    case CellType::Cleaned: return 'x';
+    case CellType::Empty:
+    default:                return '.';
+    }
+}
+
+std::string GridMap::renderRow(int y, Point robot, Point direction) const {
+    std::string line;
+    line.reserve(width);
+    for (int x = 0; x < width; ++x) {
+        Point current(x, y);
+        if (robot.isEqual(current)) {
+            line.push_back(robotSymbol(direction));
+        } else {
+            line.push_back(cellSymbol(cells[y][x]));
+        }
+    }
+    return line;
+}
+
 std::vector<std::string> GridMap::render(Point robot, Point direction) const {
     std::vector<std::string> lines;
     lines.reserve(height);
@@ -175,38 +214,7 @@ std::vector<std::string> GridMap::render(Point robot, Point direction) const {
     // 행을 위에서부터 그릴 때 논리 y가 증가할수록 화면 위쪽에 오도록 반전
     for (int row = 0; row < height; ++row) {
         const int y = height - 1 - row;
-        std::string line;
-        line.reserve(width);
-        for (int x = 0; x < width; ++x) {
-            Point current(x, y);
-            if (robot.isEqual(current)) {
-                char robotSymbol = 'R';
-                // 반전 후 화면 기준 위/아래에 맞춘 기호
-                if (direction.x == 0 && direction.y == -1) robotSymbol = 'v';
-                if (direction.x == 0 && direction.y == 1) robotSymbol = '^';
-                if (direction.x == -1 && direction.y == 0) robotSymbol = '<';
-                if (direction.x == 1 && direction.y == 0) robotSymbol = '>';
-                line.push_back(robotSymbol);
-                continue;
-            }
-
-            switch (cells[y][x]) {
-            case CellType::Wall:
-                line.push_back('#');
-                break;
-            case CellType::Dust:
-                line.push_back('*');
-                break;
-            case CellType::Cleaned:
-                line.push_back('x');
-                break;
-            case CellType::Empty:
-            default:
-                line.push_back('.');
-                break;
-            }
-        }
-        lines.push_back(line);
+        lines.push_back(renderRow(y, robot, direction));
     }
 
     return lines;

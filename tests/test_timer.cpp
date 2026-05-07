@@ -8,7 +8,3 @@
 #include <atomic>
 
 #include <gtest/gtest.h>
-
-//Timer�� ��ӹ��� testClass ����(private���� Ȯ���ϱ� ����)
-
-

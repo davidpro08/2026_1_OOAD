@@ -3,6 +3,7 @@
 #include "Class/SensorController.h"
 #include "Class/SensorProvider.h"
 #include "Class/ISensor.h"
+#include "HDWARE/Motor.h"
 
 #include <gtest/gtest.h>
 #include <memory>
@@ -49,55 +50,47 @@ public:
         }
     };
 
-    class Point {
-        public:
-        int x;
-        int y;
-		Point(int x, int y) : x(x), y(y) {}
-        bool isEqual(Point other) {
-            return this->x == other.x && this->y == other.y;
-		}
-    };
-
     class FakeMotor : public Motor {
-
     public:
-    int stopCount = 0;
-    int forwardCount = 0;
-    int backwardCount = 0;
-    int leftCount = 0;
-    int rightCount = 0;
+        Point point = Point(0, 0);
+        Point direction = Point(0, 1);
 
-		Point point = Point(0, 0);
-		// 초기 방향은 위쪽으로 가도록 설정
-		Point direction = Point(0, 1);
-        void stop() { 
+        int stopCount = 0;
+        int forwardCount = 0;
+        int backwardCount = 0;
+        int leftCount = 0;
+        int rightCount = 0;
+
+        void stop() override {
             stopCount++;
         }
-        void moveForward() { 
-            point.x = point.x + direction.x; 
-			point.y = point.y + direction.y;
+
+        void moveForward() override {
+            point.x = point.x + direction.x;
+            point.y = point.y + direction.y;
             forwardCount++;
         }
-        void turnLeft() {
-			Point temp = direction;
-			direction.x = -temp.y;
-			direction.y = temp.x;
+
+        void turnLeft() override {
+            Point temp = direction;
+            direction.x = -temp.y;
+            direction.y = temp.x;
             leftCount++;
         }
-        void turnRight() {
-			Point temp = direction;
-			direction.x = temp.y;
-			direction.y = -temp.x;
+
+        void turnRight() override {
+            Point temp = direction;
+            direction.x = temp.y;
+            direction.y = -temp.x;
             rightCount++;
         }
-        void moveBackward() {
+
+        void moveBackward() override {
             point.x = point.x - direction.x;
             point.y = point.y - direction.y;
             backwardCount++;
         }
     };
-
 
 
     class MotorControllerPowerTest : public ::testing::Test {

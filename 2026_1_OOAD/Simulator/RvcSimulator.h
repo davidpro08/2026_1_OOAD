@@ -5,6 +5,7 @@
 #include "Class/MotorController.h"
 #include "Class/PowerController.h"
 #include "Class/SensorController.h"
+#include "Class/Timer.h"
 #include "Simulator/GridMap.h"
 #include "Simulator/SimulatedCleaner.h"
 #include "Simulator/SimulatedMotor.h"
@@ -47,6 +48,7 @@ private:
     SimulatedSensor rightSensor;
     SimulatedSensor dustSensor;
     SimulatedCleaner cleaner;
+    Timer cleanerTimer;
     SensorController sensorController;
     CleanerController cleanerController;
     MotorController motorController;

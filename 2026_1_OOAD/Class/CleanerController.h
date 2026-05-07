@@ -22,19 +22,19 @@
 
 class CleanerController : public IPower {
 public:
-	CleanerController(EventBus* bus, HwCleaner* cleaner);
+	CleanerController(EventBus* bus, HwCleaner* cleaner, Timer* timer = nullptr);
 	void turnOn();
 	void turnOff() override;
 	void CCpowerUp();
 	void CCpowerRestore();
-	void tick();
 private:
 	bool isTurnOn;
 	bool powerUp;
 	HwCleaner* cleaner;
+	Timer defaultTimer;
 
 protected:
-	Timer timer;
+	Timer* timer;
 };
 
 #endif  //_CLEANERCONTROLLER_H

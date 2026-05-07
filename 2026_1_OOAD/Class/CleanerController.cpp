@@ -15,7 +15,11 @@
 
 const int PowerUpDuration = 5; // 파워업 지속 시간 (초)
 
-CleanerController::CleanerController(EventBus* bus, HwCleaner* cleaner) {
+CleanerController::CleanerController(EventBus* bus, HwCleaner* cleaner, Timer* timer)
+    : isTurnOn(false),
+      powerUp(false),
+      cleaner(cleaner),
+      timer(timer != nullptr ? timer : &defaultTimer) {
     bus->subScribeStartCleaning([this]() {
             this->turnOn();
         });
@@ -28,10 +32,6 @@ CleanerController::CleanerController(EventBus* bus, HwCleaner* cleaner) {
     bus->subScribeTurnOff([this]() {
         this->turnOff();
         });
-    Timer timer;
-    isTurnOn = false;
-    powerUp = false;
-    this->cleaner = cleaner;
 }   
 
 void CleanerController::turnOn() {
@@ -46,7 +46,7 @@ void CleanerController::turnOff() {
 
 void CleanerController::CCpowerUp() {
     cleaner->powerUp();
-    timer.setTimer(PowerUpDuration, [this]() {
+    timer->setTimer(PowerUpDuration, [this]() {
             this->CCpowerRestore();
         });
 }
@@ -55,6 +55,3 @@ void CleanerController::CCpowerRestore() {
     cleaner->powerRestore();
 }
 
-void CleanerController::tick() {
-    timer.syncTimerDigitalClock();
-}

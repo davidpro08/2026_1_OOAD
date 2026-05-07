@@ -33,7 +33,7 @@ public:
     using CleanerController::CleanerController; // ������ ���
 
     // private(protected) ���� ���� ��ȯ�ϴ� public �޼��� �߰�
-    Timer& GetTimer() { return timer; }
+    Timer& GetTimer() { return *timer; }
 };
 
 //TurnOn,Off
@@ -87,7 +87,7 @@ TEST(CleanerTest, WhenPowerUpTimerCallingCheck) {
     EXPECT_TRUE(testHwCleaner.ispowerUp);
 
     for (int i = 0; i < 5; ++i) {
-        myTestCleaner.tick();
+        myTestCleaner.GetTimer().syncTimerDigitalClock();
     }
 
     EXPECT_FALSE(testHwCleaner.ispowerUp);

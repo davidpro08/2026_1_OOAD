@@ -13,7 +13,7 @@ RvcSimulator::RvcSimulator()
       dustSensor(&map, &motor, SensorDirection::Dust),
       cleaner(&map, &motor),
       sensorController(&bus, &leftSensor, &rightSensor, &dustSensor),
-      cleanerController(&bus, &cleaner),
+      cleanerController(&bus, &cleaner, &cleanerTimer),
       motorController(&bus, motor),
       powerController(&bus),
       powerOn(false) {
@@ -92,7 +92,7 @@ void RvcSimulator::step() {
         sensorController.FrontObstacleDetected();
     }
     motorController.MCMove();
-    cleanerController.tick();
+    cleanerTimer.syncTimerDigitalClock();
 
     sensorController.ChecknPowerUp();
     cleaner.cleanCurrentCell();

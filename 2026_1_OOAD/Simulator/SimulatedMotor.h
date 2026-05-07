@@ -17,10 +17,13 @@ public:
     bool wasBlocked() const;
     void clearBlocked();
     void resetPose(Point newPosition, Point newFacing);
+    void setBroken(bool brokenState);
+    bool isBroken() const;
 
 private:
     GridMap* map;
     bool blocked;
+    bool broken;
     Point position;
     Point facing;
 

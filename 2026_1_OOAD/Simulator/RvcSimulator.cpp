@@ -1,9 +1,25 @@
 #include "Simulator/RvcSimulator.h"
+#include "Simulator/SystemTestMode.h"
 
 #include <chrono>
+#include <cctype>
 #include <iostream>
 #include <sstream>
 #include <thread>
+
+namespace {
+std::string Trim(const std::string& value) {
+    size_t start = 0;
+    while (start < value.size() && std::isspace(static_cast<unsigned char>(value[start]))) {
+        ++start;
+    }
+    size_t end = value.size();
+    while (end > start && std::isspace(static_cast<unsigned char>(value[end - 1]))) {
+        --end;
+    }
+    return value.substr(start, end - start);
+}
+}  // namespace
 
 RvcSimulator::RvcSimulator()
     : motor(&map),
@@ -16,7 +32,10 @@ RvcSimulator::RvcSimulator()
       cleanerController(&bus, &cleaner, &cleanerTimer),
       motorController(&bus, motor),
       powerController(&bus),
-      powerOn(false) {
+      powerOn(false),
+      autoStepSleepEnabled(true),
+      consecutiveAvoidSteps(0),
+      stepTraceEnabled(false) {
 }
 
 RvcSimulator::~RvcSimulator() {
@@ -24,6 +43,32 @@ RvcSimulator::~RvcSimulator() {
 }
 
 void RvcSimulator::run() {
+    while (true) {
+        std::cout << "\n===== RVC Simulator =====\n";
+        std::cout << "1. 기본 모드\n";
+        std::cout << "2. 테스트 모드\n";
+        std::cout << "3. 종료\n";
+        std::cout << "선택> ";
+
+        std::string line;
+        if (!std::getline(std::cin, line)) {
+            return;
+        }
+
+        const std::string menu = Trim(line);
+        if (menu == "1") {
+            runFreeMode();
+        } else if (menu == "2") {
+            RunSystemTestMode(*this);
+        } else if (menu == "3" || menu == "q" || menu == "quit") {
+            return;
+        } else {
+            std::cout << "잘못된 입력입니다.\n";
+        }
+    }
+}
+
+void RvcSimulator::runFreeMode() {
     std::cout << "RVC CLI 격자 시뮬레이터\n";
     printHelp();
     printScreen();
@@ -46,6 +91,26 @@ void RvcSimulator::reset() {
     motor.resetPose(Point(1, 1), Point(0, 1));
     cleaner.reset();
     powerOn = false;
+    setSensorFault(SensorDirection::Front, SimulatedSensor::FaultMode::Normal);
+    setSensorFault(SensorDirection::Left, SimulatedSensor::FaultMode::Normal);
+    setSensorFault(SensorDirection::Right, SimulatedSensor::FaultMode::Normal);
+    setSensorFault(SensorDirection::Dust, SimulatedSensor::FaultMode::Normal);
+    setMotorBroken(false);
+    consecutiveAvoidSteps = 0;
+}
+
+void RvcSimulator::resetSystemTestMap() {
+    turnOff();
+    map.resetSystemTestBase();
+    motor.resetPose(Point(1, 1), Point(0, 1));
+    cleaner.reset();
+    powerOn = false;
+    setSensorFault(SensorDirection::Front, SimulatedSensor::FaultMode::Normal);
+    setSensorFault(SensorDirection::Left, SimulatedSensor::FaultMode::Normal);
+    setSensorFault(SensorDirection::Right, SimulatedSensor::FaultMode::Normal);
+    setSensorFault(SensorDirection::Dust, SimulatedSensor::FaultMode::Normal);
+    setMotorBroken(false);
+    consecutiveAvoidSteps = 0;
 }
 
 void RvcSimulator::resetRandomMap(uint32_t seed) {
@@ -84,6 +149,9 @@ void RvcSimulator::turnOff() {
 
 void RvcSimulator::step() {
     if (!powerOn) {
+        if (stepTraceEnabled) {
+            printScreen();
+        }
         return;
     }
 
@@ -92,10 +160,19 @@ void RvcSimulator::step() {
         sensorController.FrontObstacleDetected();
     }
     motorController.MCMove();
-    cleanerTimer.syncTimerDigitalClock();
+    if (motorController.isAvoiding()) {
+        ++consecutiveAvoidSteps;
+    } else {
+        consecutiveAvoidSteps = 0;
+    }
 
     sensorController.ChecknPowerUp();
     cleaner.cleanCurrentCell();
+    cleanerTimer.syncTimerDigitalClock();
+
+    if (stepTraceEnabled) {
+        printScreen();
+    }
 }
 
 void RvcSimulator::autoStep(int count) {
@@ -106,7 +183,9 @@ void RvcSimulator::autoStep(int count) {
     for (int i = 0; i < count; ++i) {
         step();
         printScreen();
-        std::this_thread::sleep_for(std::chrono::milliseconds(150));
+        if (autoStepSleepEnabled) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(150));
+        }
     }
 }
 
@@ -173,6 +252,73 @@ bool RvcSimulator::isCleanerOn() const {
 
 bool RvcSimulator::isPowerUp() const {
     return cleaner.isPowerUp();
+}
+
+bool RvcSimulator::isAvoiding() const {
+    return motorController.isAvoiding();
+}
+
+int RvcSimulator::getConsecutiveAvoidSteps() const {
+    return consecutiveAvoidSteps;
+}
+
+bool RvcSimulator::isWallAt(int x, int y) const {
+    return map.isWall(Point(x, y));
+}
+
+bool RvcSimulator::loadSystemTestScenario(const std::vector<std::string>& layoutRowsTopToBottom,
+                                          Point startPoint,
+                                          Point startDirection) {
+    turnOff();
+    if (!map.loadLayout(layoutRowsTopToBottom)) {
+        return false;
+    }
+    if (!map.isInside(startPoint) || map.isWall(startPoint)) {
+        return false;
+    }
+
+    motor.resetPose(startPoint, startDirection);
+    cleaner.reset();
+    powerOn = false;
+    setSensorFault(SensorDirection::Front, SimulatedSensor::FaultMode::Normal);
+    setSensorFault(SensorDirection::Left, SimulatedSensor::FaultMode::Normal);
+    setSensorFault(SensorDirection::Right, SimulatedSensor::FaultMode::Normal);
+    setSensorFault(SensorDirection::Dust, SimulatedSensor::FaultMode::Normal);
+    setMotorBroken(false);
+    consecutiveAvoidSteps = 0;
+    return true;
+}
+
+void RvcSimulator::setSensorFault(SensorDirection direction, SimulatedSensor::FaultMode mode) {
+    if (direction == SensorDirection::Front) {
+        frontSensor.setFaultMode(mode);
+    } else if (direction == SensorDirection::Left) {
+        leftSensor.setFaultMode(mode);
+    } else if (direction == SensorDirection::Right) {
+        rightSensor.setFaultMode(mode);
+    } else {
+        dustSensor.setFaultMode(mode);
+    }
+}
+
+void RvcSimulator::setMotorBroken(bool broken) {
+    motor.setBroken(broken);
+}
+
+bool RvcSimulator::isMotorBlocked() const {
+    return motor.wasBlocked();
+}
+
+void RvcSimulator::setAutoStepSleepEnabled(bool enabled) {
+    autoStepSleepEnabled = enabled;
+}
+
+void RvcSimulator::setStepTraceEnabled(bool enabled) {
+    stepTraceEnabled = enabled;
+}
+
+void RvcSimulator::showCurrentScreen() const {
+    printScreen();
 }
 
 void RvcSimulator::printScreen() const {

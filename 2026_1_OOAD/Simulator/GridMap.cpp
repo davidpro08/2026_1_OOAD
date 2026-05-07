@@ -33,12 +33,6 @@ void GridMap::resetDefault() {
     setWall(Point(2, 2));
     setWall(Point(2, 3));
     setWall(Point(2, 4));
-    setWall(Point(2, 5));
-    setWall(Point(2, 6));
-    setWall(Point(2, 7));
-    setWall(Point(2, 8));
-    setWall(Point(2, 9));
-    setWall(Point(2, 10));
     setWall(Point(3, 4));
     setWall(Point(3, 8));
     setWall(Point(4, 2));
@@ -60,6 +54,71 @@ void GridMap::resetDefault() {
     setDust(Point(8, 8));
     setDust(Point(9, 4));
     setDust(Point(9, 9));
+}
+
+void GridMap::resetSystemTestBase() {
+    cells.assign(height, std::vector<CellType>(width, CellType::Empty));
+    fillBorderWalls();
+
+    // System test에서 회전/회피/장시간 주행을 모두 보기 쉬운 고정 레이아웃
+    setWall(Point(3, 2));
+    setWall(Point(3, 3));
+    setWall(Point(3, 4));
+    setWall(Point(3, 5));
+    setWall(Point(6, 4));
+    setWall(Point(7, 4));
+    setWall(Point(8, 4));
+    setWall(Point(8, 5));
+    setWall(Point(8, 6));
+    setWall(Point(5, 8));
+    setWall(Point(6, 8));
+
+    setDust(Point(1, 2));
+    setDust(Point(2, 6));
+    setDust(Point(5, 5));
+    setDust(Point(7, 7));
+    setDust(Point(9, 2));
+}
+
+bool GridMap::loadLayout(const std::vector<std::string>& rowsTopToBottom) {
+    if (rowsTopToBottom.empty()) {
+        return false;
+    }
+
+    const int newHeight = static_cast<int>(rowsTopToBottom.size());
+    const int newWidth = static_cast<int>(rowsTopToBottom.front().size());
+    if (newWidth <= 0) {
+        return false;
+    }
+
+    for (const std::string& row : rowsTopToBottom) {
+        if (static_cast<int>(row.size()) != newWidth) {
+            return false;
+        }
+    }
+
+    width = newWidth;
+    height = newHeight;
+    cells.assign(height, std::vector<CellType>(width, CellType::Empty));
+
+    for (int row = 0; row < height; ++row) {
+        const int y = height - 1 - row;
+        const std::string& text = rowsTopToBottom[row];
+        for (int x = 0; x < width; ++x) {
+            const char c = text[x];
+            if (c == '#') {
+                cells[y][x] = CellType::Wall;
+            } else if (c == '*') {
+                cells[y][x] = CellType::Dust;
+            } else if (c == 'x' || c == 'X') {
+                cells[y][x] = CellType::Cleaned;
+            } else {
+                cells[y][x] = CellType::Empty;
+            }
+        }
+    }
+
+    return true;
 }
 
 void GridMap::resetRandom(uint32_t seed) {

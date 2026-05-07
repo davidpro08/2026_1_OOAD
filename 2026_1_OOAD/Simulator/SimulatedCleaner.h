@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Class/HwCleaner.h"
+#include "HDWARE/HwCleaner.h"
 #include "Simulator/GridMap.h"
 
 class SimulatedMotor;

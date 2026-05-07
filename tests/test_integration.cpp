@@ -8,19 +8,19 @@
 
 #include <gtest/gtest.h>
 
-//Bus¿¡¼­ publishAvoidObstacleÀ» ÇÏ¿´À»¶§
+//Busï¿½ï¿½ï¿½ï¿½ publishAvoidObstacleï¿½ï¿½ ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½ï¿½
 
-//Bus¿¡¼­ publishMoveForward¸¦ ÇÏ¿´À»¶§
+//Busï¿½ï¿½ï¿½ï¿½ publishMoveForwardï¿½ï¿½ ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½ï¿½
 
-//Bus¿¡¼­ publishTurnOff¸¦ ÇÏ¿´À»¶§
+//Busï¿½ï¿½ï¿½ï¿½ publishTurnOffï¿½ï¿½ ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½ï¿½
 
-//Bus¿¡¼­ publishDectedDust¸¦ ÇÏ¿´À»¶§
+//Busï¿½ï¿½ï¿½ï¿½ publishDectedDustï¿½ï¿½ ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½ï¿½
 
-//Bus¿¡¼­ publishDectedDust ÈÄ publishDectedDust¸¦ ÇÑ¹ø ´õ ÇÏ¿´À»¶§
+//Busï¿½ï¿½ï¿½ï¿½ publishDectedDust ï¿½ï¿½ publishDectedDustï¿½ï¿½ ï¿½Ñ¹ï¿½ ï¿½ï¿½ ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½ï¿½
 
-//Bus¿¡¼­ publishMoveForward ÈÄ publishAvoidObstacle ÈÄ publishMoveForward¸¦ ÇÏ¿´À» ¶§
+//Busï¿½ï¿½ï¿½ï¿½ publishMoveForward ï¿½ï¿½ publishAvoidObstacle ï¿½ï¿½ publishMoveForwardï¿½ï¿½ ï¿½Ï¿ï¿½ï¿½ï¿½ ï¿½ï¿½
 
-//Bus¿¡¼­ publishMoveForward ÈÄ, publishDectedDust ÈÄ publishAvoidObstacle ÈÄ publishMoveForward¸¦ ÇÏ¿´À» ¶§
+//Busï¿½ï¿½ï¿½ï¿½ publishMoveForward ï¿½ï¿½, publishDectedDust ï¿½ï¿½ publishAvoidObstacle ï¿½ï¿½ publishMoveForwardï¿½ï¿½ ï¿½Ï¿ï¿½ï¿½ï¿½ ï¿½ï¿½
 
 
 

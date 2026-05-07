@@ -29,11 +29,11 @@ class Motor {
 public:
     virtual ~Motor() = default;
 
-    virtual void stop();
-    virtual void moveForward();
-    virtual void turnLeft();
-    virtual void turnRight();
-    virtual void moveBackward();
+    virtual void stop() {}
+    virtual void moveForward() {}
+    virtual void turnLeft() {}
+    virtual void turnRight() {}
+    virtual void moveBackward() {}
 };
 
 #endif  //_MOTOR_H

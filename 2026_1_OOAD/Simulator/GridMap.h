@@ -1,6 +1,6 @@
 #pragma once
 
-#include "HDWARE/Motor.h"
+#include "Simulator/Point.h"
 
 #include <cstdint>
 #include <string>

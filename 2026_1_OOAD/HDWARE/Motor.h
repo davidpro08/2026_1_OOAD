@@ -13,18 +13,6 @@
 #if !defined(_MOTOR_H)
 #define _MOTOR_H
 
-class Point {
-public:
-    int x;
-    int y;
-
-    Point(int x, int y) : x(x), y(y) {}
-
-    bool isEqual(Point other) {
-        return this->x == other.x && this->y == other.y;
-    }
-};
-
 class Motor {
 public:
     virtual ~Motor() = default;

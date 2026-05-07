@@ -18,6 +18,8 @@ public:
     GridMap();
 
     void resetDefault();
+    void resetSystemTestBase();
+    bool loadLayout(const std::vector<std::string>& rowsTopToBottom);
     /// seed가 0이면 매번 다른 맵, 0이 아니면 재현 가능한 난수 시퀀스
     void resetRandom(uint32_t seed = 0);
     int getWidth() const;

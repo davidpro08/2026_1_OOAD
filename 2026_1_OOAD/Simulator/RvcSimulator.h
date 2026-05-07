@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 
 class RvcSimulator {
 public:
@@ -21,6 +22,7 @@ public:
 
     void run();
     void reset();
+    void resetSystemTestMap();
     void resetRandomMap(uint32_t seed = 0);
     void turnOn();
     void turnOff();
@@ -40,10 +42,15 @@ public:
     bool isAvoiding() const;
     int getConsecutiveAvoidSteps() const;
     bool isWallAt(int x, int y) const;
+    bool loadSystemTestScenario(const std::vector<std::string>& layoutRowsTopToBottom,
+                                Point startPoint,
+                                Point startDirection);
     void setSensorFault(SensorDirection direction, SimulatedSensor::FaultMode mode);
     void setMotorBroken(bool broken);
     bool isMotorBlocked() const;
     void setAutoStepSleepEnabled(bool enabled);
+    void setStepTraceEnabled(bool enabled);
+    void showCurrentScreen() const;
 
 private:
     GridMap map;
@@ -61,6 +68,7 @@ private:
     bool powerOn;
     bool autoStepSleepEnabled;
     int consecutiveAvoidSteps;
+    bool stepTraceEnabled;
 
     void printScreen() const;
     void printHelp() const;

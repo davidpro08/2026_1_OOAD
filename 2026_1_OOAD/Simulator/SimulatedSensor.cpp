@@ -2,7 +2,7 @@
 #include "Simulator/SimulatedMotor.h"
 
 SimulatedSensor::SimulatedSensor(GridMap* map, SimulatedMotor* motor, SensorDirection direction)
-    : map(map), motor(motor), direction(direction) {
+    : map(map), motor(motor), direction(direction), faultMode(FaultMode::Normal) {
 }
 
 bool SimulatedSensor::detect() {
@@ -10,6 +10,13 @@ bool SimulatedSensor::detect() {
 }
 
 bool SimulatedSensor::peek() const {
+    if (faultMode == FaultMode::StuckFalse) {
+        return false;
+    }
+    if (faultMode == FaultMode::StuckTrue) {
+        return true;
+    }
+
     if (!map || !motor) {
         return false;
     }
@@ -19,6 +26,14 @@ bool SimulatedSensor::peek() const {
     }
 
     return map->isWall(getTargetPoint());
+}
+
+void SimulatedSensor::setFaultMode(FaultMode mode) {
+    faultMode = mode;
+}
+
+SimulatedSensor::FaultMode SimulatedSensor::getFaultMode() const {
+    return faultMode;
 }
 
 Point SimulatedSensor::getTargetPoint() const {

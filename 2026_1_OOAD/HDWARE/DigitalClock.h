@@ -1,13 +1,15 @@
+#pragma once
+
 #include "Class/Timer.h"
 
 class DigitalClock {
 private:
-    int current_Time =0;
+    int current_Time = 0;
     Timer timer;
+
 public:
-    
     void Update() {
-    current_Time++;
+        current_Time++;
     }
 
     int getCurrentTime() {

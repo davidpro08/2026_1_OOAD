@@ -4,6 +4,7 @@
 #include "Class/SensorProvider.h"
 #include "Class/ISensor.h"
 #include "HDWARE/Motor.h"
+#include "Simulator/Point.h"
 
 #include <gtest/gtest.h>
 #include <memory>

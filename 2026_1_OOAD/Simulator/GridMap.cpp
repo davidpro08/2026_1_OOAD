@@ -189,7 +189,7 @@ char GridMap::cellSymbol(CellType cell) {
     case CellType::Dust:    return '*';
     case CellType::Cleaned: return 'x';
     case CellType::Empty:
-    default:                return '.';
+    default:                return ' . ';
     }
 }
 

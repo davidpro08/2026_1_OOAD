@@ -1,4 +1,4 @@
-#include "Class/timer.h"
+#include "Class/Timer.h"
 
 class DigitalClock {
 private:

@@ -12,12 +12,12 @@
 
 #include "EventBus.h"
 
-void EventBus::publishMoveForward() {
-    for (auto& cb : moveForwardSubs) cb();
+void EventBus::publishStartCleaning() {
+    for (auto& cb : startCleaningSubs) cb();
 }
 
-void EventBus::subScribeMoveForward(moveForwardCallBack cb) {
-    moveForwardSubs.push_back(cb);
+void EventBus::subScribeStartCleaning(startCleaningCallBack cb) {
+    startCleaningSubs.push_back(cb);
 }
 
 void EventBus::publishAvoidObstacle(SensorController* sender) {

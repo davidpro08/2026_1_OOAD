@@ -90,7 +90,7 @@ void RvcSimulator::step() {
     if (frontSensor.detect()) {
         sensorController.FrontObstacleDetected();
     } else {
-        bus.publishMoveForward();
+        bus.publishStartCleaning();
     }
 
     sensorController.ChecknPowerUp();

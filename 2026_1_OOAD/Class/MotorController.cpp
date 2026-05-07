@@ -17,8 +17,8 @@
 MotorController::MotorController(EventBus* bus, Motor& motor)
     : bus(bus), motor(motor), isTurnOn(false) {
 
-    bus->subScribeMoveForward([this]() {
-        this->MCMoveForward();
+    bus->subScribeStartCleaning([this]() {
+        this->MCMove();
     });
     bus->subScribeAvoidObstacle([this](SensorController* sensor) {
         this->AvoidObstacle(*sensor);
@@ -34,7 +34,7 @@ void MotorController::turnOff() {
 }
 
 void MotorController::AvoidObstacle(SensorProvider& provider) {
-    if(isTurnOn == false) {
+    if(isTurnOn == false&&!avoiding) {
         return;
 	}
 
@@ -47,27 +47,44 @@ void MotorController::AvoidObstacle(SensorProvider& provider) {
     }else if(provider.getLeftState() == false){
         MCTurnLeft();
     }else{
-        int retry_limit = 100; 
-        MCMoveBackward();
-        while (provider.getLeftState() && provider.getRightState() && --retry_limit > 0) {
             MCMoveBackward();
+            avoiding = true;
+            
         }
-        if(provider.getRightState() == false) {
-            MCTurnRight();
-        }else if(provider.getLeftState() == false){
-            MCTurnLeft();
-        }
-    }
 
-    bus->publishMoveForward();
-}
+        
+    }
 
 void MotorController::MCStop() {
     motor.stop();
 }
 
-void MotorController::MCMoveForward() {
-    motor.moveForward();
+void MotorController::MCMove() {
+    if(!avoiding) {
+        motor.moveForward();
+        return;
+    }
+}
+
+void MotorController::MCMove(SensorProvider& provider) {
+    if(!avoiding) {
+        motor.moveForward();
+        return;
+    }
+    else{
+        if(provider.getLeftState() && provider.getRightState() ) {
+            MCMoveBackward();
+        }
+        if(provider.getRightState() == false) {
+            MCTurnRight();
+            avoiding = false;
+            bus->publishStartCleaning();
+        }else if(provider.getLeftState() == false){
+            MCTurnLeft();
+            avoiding = false;
+            bus->publishStartCleaning();
+        }
+    }
 }
 
 void MotorController::MCTurnLeft() {

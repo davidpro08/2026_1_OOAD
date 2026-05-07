@@ -21,7 +21,7 @@ SensorController::SensorController(EventBus* bus, ISensor* leftSensor, ISensor* 
     this->dustSensor = dustSensor;
     isTurnOn = false;
     doCheck = false;
-    bus->subScribeMoveForward([this]() {
+    bus->subScribeStartCleaning([this]() {
         this->doDustCheck();
         });
     bus->subScribeAvoidObstacle([this](SensorController* sensor) {

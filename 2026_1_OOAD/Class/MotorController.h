@@ -29,8 +29,10 @@ private:
 	EventBus* bus;
 	SensorProvider mySensor;
 	Motor& motor;
+	bool avoiding =false;
 	bool isTurnOn;
-	void MCMoveForward();
+	void MCMove();
+	void MCMove(SensorProvider& provider);
 	void MCTurnLeft();
 	void MCTurnRight();
 	void MCMoveBackward();

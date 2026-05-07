@@ -20,13 +20,13 @@ class SensorController;
 
 class EventBus {
 public:
-	using moveForwardCallBack = std::function<void()>;
+	using startCleaningCallBack = std::function<void()>;
 	using avoidObstacleCallBack = std::function<void(SensorController* sender)>;
 	using detectDustCallBack = std::function<void()>;
 	using turnOffCallBack = std::function<void()>;
 
-	void publishMoveForward();
-	void subScribeMoveForward(moveForwardCallBack cb);
+	void publishStartCleaning();
+	void subScribeStartCleaning(startCleaningCallBack cb);
 	void publishAvoidObstacle(SensorController* sender);
 	void subScribeAvoidObstacle(avoidObstacleCallBack cb);
 	void publishDetectedDust();
@@ -35,7 +35,7 @@ public:
 	void subScribeTurnOff(turnOffCallBack cb);
 
 private:
-	std::vector<moveForwardCallBack> moveForwardSubs;
+	std::vector<startCleaningCallBack> startCleaningSubs;
 	std::vector<avoidObstacleCallBack> avoidObstacleSubs;
 	std::vector<detectDustCallBack> detectedDustSubs;
 	std::vector<turnOffCallBack> turnOffSubs;

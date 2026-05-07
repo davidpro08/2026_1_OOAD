@@ -64,13 +64,13 @@ TEST(CleanerTest, CleanerControllerBusSubscribeCheck) {
     FakeHwCleaner testHwCleaner;
     TestCleaner myTestCleaner(&bus, &testHwCleaner);
     SensorController* testSensor = NULL;
-    bus.publishMoveForward();
+    bus.publishStartCleaning();
     EXPECT_EQ(testHwCleaner.isturnOn, true);
     bus.publishDetectedDust();
     EXPECT_EQ(testHwCleaner.ispowerUp, true);
     bus.publishAvoidObstacle(testSensor);
     EXPECT_EQ(testHwCleaner.isturnOn, false);
-    bus.publishMoveForward();
+    bus.publishStartCleaning();
     EXPECT_EQ(testHwCleaner.isturnOn, true);
     bus.publishTurnOff();
     EXPECT_EQ(testHwCleaner.isturnOn, false);

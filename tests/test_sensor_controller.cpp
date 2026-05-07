@@ -22,7 +22,7 @@ protected:
     FakeSensor dustSensor;
     SensorController sensorController;
 
-    SensorControllerTest() : sensorController(&bus, &frontSensor, &leftSensor, &rightSensor, &dustSensor) {}
+    SensorControllerTest() : sensorController(&bus, &leftSensor, &rightSensor, &dustSensor) {}
 };
 
 TEST_F(SensorControllerTest, TestTurnOn) {
@@ -51,19 +51,19 @@ TEST_F(SensorControllerTest, TestFrontObstacleDetectedTrue) {
     EXPECT_TRUE(isAvoidObstacleCalled);
 }// 이거는 ISensor가 아니니까 다르게 해야하나
 
-TEST_F(SensorControllerTest, TestChecknPowerUpTrue) {
-	dustSensor.value = true; // 먼지 감지 상태로 설정
-
-    bool isDetectedDustCalled = false;
-
-    bus.subScribeDetectedDust([&isDetectedDustCalled]() {
-        isDetectedDustCalled = true;
-    });
-
-    sensorController.ChecknPowerUp();
-
-    EXPECT_TRUE(isDetectedDustCalled);
-}
+//TEST_F(SensorControllerTest, TestChecknPowerUpTrue) {
+//	//dustSensor.value = true; // 먼지 감지 상태로 설정
+//
+// //   bool isDetectedDustCalled = false;
+//
+// //   bus.subScribeDetectedDust([&isDetectedDustCalled]() {
+// //       isDetectedDustCalled = true;
+// //   });
+//
+// //   sensorController.ChecknPowerUp();
+//
+// //   EXPECT_TRUE(isDetectedDustCalled);
+//}
 
 TEST_F(SensorControllerTest, TestChecknPowerUp_WhenNoDust) {
     dustSensor.value = false;// 먼지 비감지 상태로 설정

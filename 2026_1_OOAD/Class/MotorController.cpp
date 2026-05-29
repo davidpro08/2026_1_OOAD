@@ -26,11 +26,15 @@ MotorController::MotorController(EventBus* bus, Motor& motor)
 void MotorController::turnOn() {
     isTurnOn = true;
     avoiding = false;
+    isBackward = false;
+    afterTurnRight = false;
 }
 
 void MotorController::turnOff() {
     isTurnOn = false;
     avoiding = false;
+    isBackward = false;
+    afterTurnRight = false;
     mySensor = nullptr;
 }
 
@@ -43,14 +47,20 @@ void MotorController::AvoidObstacle(SensorProvider& provider) {
     if (afterTurnRight == true) {
         MCTurnLeft();
         avoiding = true;
+        isBackward = true;
         afterTurnRight = false;
-    }
-    else if (provider.getLeftState() == true) {
-        MCTurnRight();
-        afterTurnRight = true;
-    }else{
+    }else if (provider.getLeftState() == false) {
         MCTurnLeft();
         avoiding = false;
+        isBackward = false;
+        afterTurnRight = false;
+    }else {
+        if (isBackward == true) {
+            avoiding = true;
+            isBackward = false;
+        }
+        MCTurnRight();
+        afterTurnRight = true;
     }
 }
 void MotorController::MCStop() {
@@ -62,7 +72,12 @@ void MotorController::MCMove() {
         return;
     }
 
-    if(avoiding == false) {
+    if(isBackward == false) {
+        if(afterTurnRight == true) {
+            avoiding = false;
+            isBackward = false;
+            afterTurnRight = false;
+        }
         bus->publishStartCleaning();
         motor.moveForward();
     }else{
@@ -86,5 +101,5 @@ void MotorController::MCMoveBackward() {
 }
 
 bool MotorController::isAvoiding() const {
-    return avoiding;
+    return avoiding && isBackward && !afterTurnRight;
 }

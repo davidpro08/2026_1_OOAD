@@ -34,6 +34,7 @@ private:
 	Motor& motor;
 	bool isTurnOn;
 	bool avoiding = false;
+	bool isBackward = false;
 	bool afterTurnRight = false;
 	void MCTurnLeft();
 	void MCTurnRight();

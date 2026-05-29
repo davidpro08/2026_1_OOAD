@@ -155,10 +155,15 @@ void RvcSimulator::step() {
     }
 
     motor.clearBlocked();
+    Point facingBeforeObstacleCheck = motor.getFacing();
+    bool obstacleEventHandled = false;
     if (frontSensor.detect() && !motorController.isAvoiding()) {
         sensorController.FrontObstacleDetected();
+        obstacleEventHandled = true;
     }
-    motorController.MCMove();
+    if (!(obstacleEventHandled && !facingBeforeObstacleCheck.isEqual(motor.getFacing()))) {
+        motorController.MCMove();
+    }
     if (motorController.isAvoiding()) {
         ++consecutiveAvoidSteps;
     } else {

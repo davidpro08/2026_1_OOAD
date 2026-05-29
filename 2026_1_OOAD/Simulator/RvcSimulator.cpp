@@ -25,10 +25,9 @@ RvcSimulator::RvcSimulator()
     : motor(&map),
       frontSensor(&map, &motor, SensorDirection::Front),
       leftSensor(&map, &motor, SensorDirection::Left),
-      rightSensor(&map, &motor, SensorDirection::Right),
       dustSensor(&map, &motor, SensorDirection::Dust),
       cleaner(&map, &motor),
-      sensorController(&bus, &leftSensor, &rightSensor, &dustSensor),
+      sensorController(&bus, &leftSensor, &dustSensor),
       cleanerController(&bus, &cleaner, &cleanerTimer),
       motorController(&bus, motor),
       powerController(&bus),
@@ -220,7 +219,7 @@ std::string RvcSimulator::statusText() const {
         << " (" << motor.getFacing().x << ", " << motor.getFacing().y << ")\n";
     out << "센서 - 전방벽: " << (frontSensor.peek() ? "1" : "0")
         << ", 좌측벽: " << (leftSensor.peek() ? "1" : "0")
-        << ", 우측벽: " << (rightSensor.peek() ? "1" : "0")
+        << ", 우측벽: " << ("모르는 상태")
         << ", 현재먼지: " << (dustSensor.peek() ? "1" : "0") << '\n';
     out << "범례: # 벽, . 빈칸, * 먼지, x 청소완료, ^v<> RVC";
     return out.str();
@@ -294,8 +293,8 @@ void RvcSimulator::setSensorFault(SensorDirection direction, SimulatedSensor::Fa
         frontSensor.setFaultMode(mode);
     } else if (direction == SensorDirection::Left) {
         leftSensor.setFaultMode(mode);
-    } else if (direction == SensorDirection::Right) {
-        rightSensor.setFaultMode(mode);
+    // } else if (direction == SensorDirection::Right) {
+    //     rightSensor.setFaultMode(mode);
     } else {
         dustSensor.setFaultMode(mode);
     }

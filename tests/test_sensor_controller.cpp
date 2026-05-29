@@ -18,11 +18,10 @@ protected:
     EventBus bus;
     FakeSensor frontSensor;
     FakeSensor leftSensor;
-    FakeSensor rightSensor;
     FakeSensor dustSensor;
     SensorController sensorController;
 
-    SensorControllerTest() : sensorController(&bus, &leftSensor, &rightSensor, &dustSensor) {}
+    SensorControllerTest() : sensorController(&bus, &leftSensor, &dustSensor) {}
 };
 
 TEST_F(SensorControllerTest, TestTurnOn) {
@@ -89,14 +88,4 @@ TEST_F(SensorControllerTest, TestGetLeftStateFalse) {
         leftSensor.value = false;
 
         EXPECT_FALSE(sensorController.getLeftState());
-}
-
-TEST_F(SensorControllerTest, TestGetRightStateFalse) {
-	  rightSensor.value = false;
-      EXPECT_FALSE(sensorController.getRightState());
-}
-
-TEST_F(SensorControllerTest, TestGetRightStateTrue) {
-      rightSensor.value = true; 
-      EXPECT_TRUE(sensorController.getRightState());
 }

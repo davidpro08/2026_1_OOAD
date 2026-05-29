@@ -40,17 +40,17 @@ void MotorController::AvoidObstacle(SensorProvider& provider) {
         return;
 	}
 
-    if(afterTurnRight == false) {
-        if (provider.getLeftState() == false) {
-            MCTurnRight();
-            afterTurnRight = true;
-        }
-        else {
-			MCTurnLeft();
-        }
+    if (afterTurnRight == true) {
+        MCTurnLeft();
+        avoiding = true;
+        afterTurnRight = false;
     }
-    else {
-		avoiding = true;
+    else if (provider.getLeftState() == true) {
+        MCTurnRight();
+        afterTurnRight = true;
+    }else{
+        MCTurnLeft();
+        avoiding = false;
     }
 }
 void MotorController::MCStop() {
@@ -58,16 +58,18 @@ void MotorController::MCStop() {
 }
 
 void MotorController::MCMove() {
-    if(!avoiding) {
+    if(isTurnOn == false) {
+        return;
+    }
+
+    if(avoiding == false) {
         bus->publishStartCleaning();
         motor.moveForward();
     }else{
-        if (afterTurnRight == true) {
-            MCTurnLeft();
-            afterTurnRight = false;
-        }
         MCMoveBackward();
-        bus->publishAvoidObstacle(mySensor);
+        if (mySensor != nullptr) {
+            bus->publishAvoidObstacle(mySensor);
+        }
     }
 }
 

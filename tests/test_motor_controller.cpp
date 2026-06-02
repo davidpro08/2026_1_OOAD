@@ -23,31 +23,20 @@ public:
     class FakeSensorProvider : public SensorProvider {
     public:
         bool left = true;
-        bool right = true;
 
         bool getLeftState() override { return left; }
-        bool getRightState() override { return right; }
     };
 
     class ScriptedSensorProvider : public SensorProvider {
     public:
         std::vector<bool> leftStates;
-        std::vector<bool> rightStates;
         size_t leftIndex = 0;
-        size_t rightIndex = 0;
 
         bool getLeftState() override {
             if (leftIndex < leftStates.size()) {
                 return leftStates[leftIndex++];
             }
             return leftStates.empty() ? true : leftStates.back();
-        }
-
-        bool getRightState() override {
-            if (rightIndex < rightStates.size()) {
-                return rightStates[rightIndex++];
-            }
-            return rightStates.empty() ? true : rightStates.back();
         }
     };
 
@@ -107,7 +96,6 @@ public:
 
             // 앞으로 가도록 유도
 			sensorProvider.left = false;
-            sensorProvider.right = false;
         }
 
     };
@@ -117,10 +105,10 @@ public:
 
         motorController->AvoidObstacle(sensorProvider);
         motorController->MCMove();
-        ASSERT_TRUE(motor.point.isEqual(Point(1, 0)));
+        ASSERT_TRUE(motor.point.isEqual(Point(-1, 0)));
         ASSERT_EQ(motor.stopCount, 0);
         ASSERT_EQ(motor.forwardCount, 1);
-        ASSERT_EQ(motor.rightCount, 1);
+        ASSERT_EQ(motor.leftCount, 1);
 
     };
 
@@ -155,36 +143,15 @@ public:
     };
 
     TEST_F(MotorControllerAvoidTest, FrontObstacle) {
-        // 앞만 막혀있는 상황
+        // 앞만 막혀 있고 왼쪽이 열려 있는 상황
 		sensorProvider.left = false;
-		sensorProvider.right = false;
-
-        motorController->AvoidObstacle(sensorProvider);
-        motorController->MCMove();
-
-        ASSERT_TRUE(motor.point.isEqual(Point(1, 0)));
-        ASSERT_FALSE(motor.point.isEqual(Point(0, 1)));
-        ASSERT_FALSE(motor.point.isEqual(Point(-1, 0)));        
-        ASSERT_FALSE(motor.point.isEqual(Point(0, -1)));
-
-        ASSERT_EQ(motor.stopCount, 0);
-        ASSERT_EQ(motor.forwardCount, 1);
-        ASSERT_EQ(motor.backwardCount, 0);
-        ASSERT_EQ(motor.leftCount, 0);
-        ASSERT_EQ(motor.rightCount, 1);
-    };
-
-    TEST_F(MotorControllerAvoidTest, RightObstacle) {
-        // 앞, 오른쪽이 막혀있는 상황
-        sensorProvider.left = false;
-        sensorProvider.right = true;
 
         motorController->AvoidObstacle(sensorProvider);
         motorController->MCMove();
 
         ASSERT_TRUE(motor.point.isEqual(Point(-1, 0)));
         ASSERT_FALSE(motor.point.isEqual(Point(0, 1)));
-        ASSERT_FALSE(motor.point.isEqual(Point(1, 0)));
+        ASSERT_FALSE(motor.point.isEqual(Point(1, 0)));        
         ASSERT_FALSE(motor.point.isEqual(Point(0, -1)));
 
         ASSERT_EQ(motor.stopCount, 0);
@@ -194,80 +161,82 @@ public:
         ASSERT_EQ(motor.rightCount, 0);
     };
 
-    TEST_F(MotorControllerAvoidTest, LeftObstacle) {
-        // 앞, 왼쪽이 막혀있는 상황
+    TEST_F(MotorControllerAvoidTest, LeftOpenEscapesWithoutRightSensor) {
+        // 오른쪽 센서 없이도 왼쪽이 열려 있으면 좌회전 후 탈출한다.
+        sensorProvider.left = false;
+
+        motorController->AvoidObstacle(sensorProvider);
+        motorController->MCMove();
+
+        ASSERT_TRUE(motor.point.isEqual(Point(-1, 0)));
+        ASSERT_EQ(motor.forwardCount, 1);
+        ASSERT_EQ(motor.leftCount, 1);
+        ASSERT_EQ(motor.rightCount, 0);
+        ASSERT_FALSE(motorController->isAvoiding());
+    };
+
+    TEST_F(MotorControllerAvoidTest, LeftBlockedTurnsRightWithoutRightSensor) {
+        // 앞과 왼쪽이 막혀 있으면 오른쪽 센서 없이 오른쪽으로 돌아 전방을 확인한다.
         sensorProvider.left = true;
-        sensorProvider.right = false;
 
         motorController->AvoidObstacle(sensorProvider);
         motorController->MCMove();
 
         ASSERT_TRUE(motor.point.isEqual(Point(1, 0)));
-        ASSERT_FALSE(motor.point.isEqual(Point(0, 1)));
-        ASSERT_FALSE(motor.point.isEqual(Point(-1, 0)));
-        ASSERT_FALSE(motor.point.isEqual(Point(0, -1)));
-
-        ASSERT_EQ(motor.stopCount, 0);
         ASSERT_EQ(motor.forwardCount, 1);
         ASSERT_EQ(motor.backwardCount, 0);
         ASSERT_EQ(motor.leftCount, 0);
         ASSERT_EQ(motor.rightCount, 1);
+        ASSERT_FALSE(motorController->isAvoiding());
     };
 
-    TEST_F(MotorControllerAvoidTest, LeftAndRightObstacle) {
-        ScriptedSensorProvider scripted;
-        scripted.leftStates = {true, true, true, true, true, true};
-        scripted.rightStates = {true, true, true, false, false, false};
-
-        motorController->AvoidObstacle(scripted);
-        motorController->MCMove();
-        motorController->MCMove();
-        motorController->MCMove();
-        motorController->MCMove();
-
-        ASSERT_EQ(motor.stopCount, 0);
-        ASSERT_EQ(motor.backwardCount, 3);
-        ASSERT_EQ(motor.rightCount, 1);
-        ASSERT_EQ(motor.leftCount, 0);
-        ASSERT_EQ(motor.forwardCount, 1);
-
-        ASSERT_TRUE(motor.point.isEqual(Point(1, -3)));
-    };
-
-    TEST_F(MotorControllerAvoidTest, BothKeep) {
+    TEST_F(MotorControllerAvoidTest, RightCheckBlockedStartsBackwardWithoutRightSensor) {
+        // 왼쪽이 막혀 우회전한 뒤에도 다시 장애물 이벤트가 오면 후진한다.
         ScriptedSensorProvider scripted;
         scripted.leftStates = {true};
-        scripted.rightStates = {true};
 
         motorController->AvoidObstacle(scripted);
-        for (int i = 0; i < 100; ++i) {
-            motorController->MCMove();
-        }
+        motorController->AvoidObstacle(scripted);
+        motorController->MCMove();
+
+        ASSERT_EQ(motor.rightCount, 2);
+        ASSERT_EQ(motor.leftCount, 1);
+        ASSERT_EQ(motor.backwardCount, 1);
+        ASSERT_TRUE(motor.point.isEqual(Point(0, -1)));
+        ASSERT_FALSE(motorController->isAvoiding());
+    };
+
+    TEST_F(MotorControllerAvoidTest, BackwardWithLeftStillBlockedChecksRightAgain) {
+        ScriptedSensorProvider scripted;
+        scripted.leftStates = {true};
+
+        motorController->AvoidObstacle(scripted);
+        motorController->AvoidObstacle(scripted);
+        motorController->MCMove();
 
         ASSERT_EQ(motor.stopCount, 0);
-        ASSERT_EQ(motor.backwardCount, 100);
-        ASSERT_EQ(motor.rightCount, 0);
-        ASSERT_EQ(motor.leftCount, 0);
+        ASSERT_EQ(motor.backwardCount, 1);
+        ASSERT_EQ(motor.rightCount, 2);
+        ASSERT_EQ(motor.leftCount, 1);
         ASSERT_EQ(motor.forwardCount, 0);
 
-        ASSERT_TRUE(motor.point.isEqual(Point(0, -100)));
+        ASSERT_TRUE(motor.point.isEqual(Point(0, -1)));
+        ASSERT_FALSE(motorController->isAvoiding());
     };
 
     TEST_F(MotorControllerAvoidTest, SeqLeftOpen) {
         ScriptedSensorProvider scripted;
-        scripted.leftStates = {true, true, true, false, false};
-        scripted.rightStates = {true, true, true, true, true};
+        scripted.leftStates = {true, false};
 
+        motorController->AvoidObstacle(scripted);
         motorController->AvoidObstacle(scripted);
         motorController->MCMove();
         motorController->MCMove();
-        motorController->MCMove();
-        motorController->MCMove();
 
-        ASSERT_EQ(motor.backwardCount, 3);
-        ASSERT_EQ(motor.leftCount, 1);
-        ASSERT_EQ(motor.rightCount, 0);
+        ASSERT_EQ(motor.backwardCount, 1);
+        ASSERT_EQ(motor.leftCount, 2);
+        ASSERT_EQ(motor.rightCount, 1);
         ASSERT_EQ(motor.forwardCount, 1);
-        ASSERT_TRUE(motor.point.isEqual(Point(-1, -3)));
+        ASSERT_TRUE(motor.point.isEqual(Point(-1, -1)));
     };
 }

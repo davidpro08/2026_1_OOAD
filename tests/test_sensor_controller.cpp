@@ -50,6 +50,20 @@ TEST_F(SensorControllerTest, TestFrontObstacleDetectedTrue) {
     EXPECT_TRUE(isAvoidObstacleCalled);
 }// 이거는 ISensor가 아니니까 다르게 해야하나
 
+TEST_F(SensorControllerTest, TestFrontObstacleDetectedProvidesLeftStateOnly) {
+    leftSensor.value = false;
+    SensorProvider* provider = nullptr;
+
+    bus.subScribeAvoidObstacle([&provider](SensorProvider* sender) {
+        provider = sender;
+    });
+
+    sensorController.FrontObstacleDetected();
+
+    ASSERT_NE(provider, nullptr);
+    EXPECT_FALSE(provider->getLeftState());
+}
+
 //TEST_F(SensorControllerTest, TestChecknPowerUpTrue) {
 //	//dustSensor.value = true; // 먼지 감지 상태로 설정
 //
@@ -88,4 +102,21 @@ TEST_F(SensorControllerTest, TestGetLeftStateFalse) {
         leftSensor.value = false;
 
         EXPECT_FALSE(sensorController.getLeftState());
+}
+
+TEST_F(SensorControllerTest, TestAvoidObstacleStopsDustCheckWithoutRightSensor) {
+    dustSensor.value = true;
+    int detectedDustCount = 0;
+
+    bus.subScribeDetectedDust([&detectedDustCount]() {
+        detectedDustCount++;
+    });
+
+    bus.publishStartCleaning();
+    sensorController.ChecknPowerUp();
+    EXPECT_EQ(detectedDustCount, 1);
+
+    sensorController.FrontObstacleDetected();
+    sensorController.ChecknPowerUp();
+    EXPECT_EQ(detectedDustCount, 1);
 }

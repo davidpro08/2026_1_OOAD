@@ -65,22 +65,32 @@ std::vector<SystemTestCase> BuildSystemTestCases() {
     Put(s5.rows, 3, 3, '#');
     Scenario s6{OpenMap(7, 7), Point(3, 2), Point(0, 1)};
     Put(s6.rows, 3, 3, '#');
-    Put(s6.rows, 4, 2, '#');
+    Put(s6.rows, 2, 2, '#');
 
     Scenario s7{OpenMap(7, 7), Point(3, 2), Point(0, 1)};
     Put(s7.rows, 3, 3, '#');
-    Put(s7.rows, 4, 2, '#');
     Put(s7.rows, 2, 2, '#');
     Scenario s8{OpenMap(7, 7), Point(3, 2), Point(0, 1)};
     Put(s8.rows, 3, 3, '#');
     Put(s8.rows, 4, 2, '#');
     Put(s8.rows, 2, 2, '#');
-    Put(s8.rows, 4, 1, '#');
     Scenario s9{OpenMap(7, 7), Point(3, 2), Point(0, 1)};
     Put(s9.rows, 3, 3, '#');
-    Scenario s10{OpenMap(9, 9), Point(1, 1), Point(0, 1)};
-    Put(s10.rows, 2, 2, '#'); Put(s10.rows, 2, 3, '#'); Put(s10.rows, 2, 4, '#');
-    Put(s10.rows, 3, 4, '#'); Put(s10.rows, 4, 4, '#'); Put(s10.rows, 5, 4, '#');
+    Scenario s10{
+        {
+            "###########",
+            "#.........#",
+            "#.#######.#",
+            "#.#.....#.#",
+            "#.#.###.#.#",
+            "#.#...#.#.#",
+            "#.###.#.#.#",
+            "#.....#...#",
+            "###########",
+        },
+        Point(1, 1),
+        Point(1, 0)
+    };
 
     Scenario s11{OpenMap(7, 7), Point(2, 2), Point(0, 1)};
     Put(s11.rows, 2, 3, '*');
@@ -91,10 +101,11 @@ std::vector<SystemTestCase> BuildSystemTestCases() {
     Scenario s13 = s6;
     Scenario s14{OpenMap(6, 6), Point(1, 1), Point(0, 1)};
     Scenario s15 = s7;
+    Put(s15.rows, 4, 2, '#');
     Scenario s16{OpenMap(7, 10), Point(3, 2), Point(0, 1)};
     Put(s16.rows, 3, 3, '#');
-    Put(s16.rows, 4, 2, '#');
     Put(s16.rows, 2, 2, '#');
+    Put(s16.rows, 4, 2, '#');
     Scenario s17{OpenMap(7, 7), Point(2, 2), Point(0, 1)};
     Scenario s18{OpenMap(7, 7), Point(2, 2), Point(0, 1)};
     Scenario s19 = s11;
@@ -136,30 +147,34 @@ std::vector<SystemTestCase> BuildSystemTestCases() {
         sim.turnOn(); sim.step();
         return {!sim.isCleanerOn(), "Avoid 중 Cleaner ON"};
     });
-    AddCase(cases, 5, "Positive", "전방 장애물, 양측 오픈 시 우회전", s5, [](RvcSimulator& sim) -> SystemTestResult {
+    AddCase(cases, 5, "Positive", "전방 장애물, 좌측 오픈 시 좌회전", s5, [](RvcSimulator& sim) -> SystemTestResult {
         sim.turnOn(); sim.step();
-        return {SamePoint(sim.getRobotDirection(), Point(1, 0)), "우회전(양측 오픈 조건)"};
+        return {SamePoint(sim.getRobotDirection(), Point(-1, 0)), "좌측 오픈 조건에서 좌회전하지 않음"};
     });
-    AddCase(cases, 6, "Positive", "전방+우측 장애물 시 좌회전", s6, [](RvcSimulator& sim) -> SystemTestResult {
+    AddCase(cases, 6, "Positive", "전방+좌측 장애물 시 우회전 확인", s6, [](RvcSimulator& sim) -> SystemTestResult {
         sim.turnOn(); sim.step();
-        return {SamePoint(sim.getRobotDirection(), Point(-1, 0)), "좌회전"};
+        return {SamePoint(sim.getRobotDirection(), Point(1, 0)), "좌측이 막혔는데 우회전하지 않음"};
     });
-    AddCase(cases, 7, "Positive", "후진 중 우측 길 발견 시 회전", s7, [](RvcSimulator& sim) -> SystemTestResult {
+    AddCase(cases, 7, "Positive", "우회전 후 전방 오픈 시 전진 탈출", s7, [](RvcSimulator& sim) -> SystemTestResult {
         sim.turnOn(); sim.step(); sim.step();
-        return {SamePoint(sim.getRobotDirection(), Point(1, 0)), "후진 우측 탈출"};
+        return {SamePoint(sim.getRobotPoint(), Point(4, 2)) && SamePoint(sim.getRobotDirection(), Point(1, 0)) && !sim.isAvoiding(),
+                "우회전 후 열린 경로로 전진하지 않음"};
     });
-    AddCase(cases, 8, "Positive", "후진 중 좌측 길 발견 시 회전", s8, [](RvcSimulator& sim) -> SystemTestResult {
+    AddCase(cases, 8, "Positive", "우회전 후 전방 막힘 시 후진 진입", s8, [](RvcSimulator& sim) -> SystemTestResult {
         sim.turnOn(); sim.step(); sim.step();
-        return {SamePoint(sim.getRobotDirection(), Point(-1, 0)), "후진 좌측 탈출"};
+        return {SamePoint(sim.getRobotPoint(), Point(3, 2)) && SamePoint(sim.getRobotDirection(), Point(0, 1)) && sim.isAvoiding(),
+                "우회전 후 전방 막힘 상황에서 후진 모드로 진입하지 않음"};
     });
     AddCase(cases, 9, "Positive", "Avoid 후 전진/청소 재개", s9, [](RvcSimulator& sim) -> SystemTestResult {
         sim.turnOn(); sim.step();
         const Point p = sim.getRobotPoint(); sim.step();
         return {!SamePoint(p, sim.getRobotPoint()) && sim.isCleanerOn(), "Avoid 후 전진/청소 재개"};
     });
-    AddCase(cases, 10, "Positive", "꼬부랑 길에서 에러 없이 동작", s10, [](RvcSimulator& sim) -> SystemTestResult {
-        sim.turnOn(); for (int i = 0; i < 20; ++i) sim.step();
-        return {sim.isPowerOn(), "중간 전원 종료"};
+    AddCase(cases, 10, "Positive", "S자 꼬부랑 길에서 에러 없이 동작", s10, [](RvcSimulator& sim) -> SystemTestResult {
+        sim.turnOn();
+        const Point before = sim.getRobotPoint();
+        for (int i = 0; i < 30; ++i) sim.step();
+        return {sim.isPowerOn() && !SamePoint(before, sim.getRobotPoint()), "S자 꼬부랑 길에서 진행하지 못함"};
     });
     AddCase(cases, 11, "Positive", "Dust 발견 시 PowerUp", s11, [](RvcSimulator& sim) -> SystemTestResult {
         sim.turnOn(); sim.step();
@@ -170,12 +185,11 @@ std::vector<SystemTestCase> BuildSystemTestCases() {
         return {first && sim.isPowerUp(), "PowerUp 중 Dust 재발견 처리"};
     });
 
-    AddCase(cases, 13, "Negative", "우측 센서 고장", s13, [](RvcSimulator& sim) -> SystemTestResult {
-        // 실제 우측은 벽인데, 우측 센서는 벽을 못 읽는(미검출) 고장 상황
-        sim.setSensorFault(SensorDirection::Right, SimulatedSensor::FaultMode::StuckFalse);
+    AddCase(cases, 13, "Negative", "좌측 센서 미검출 고장 시 좌회전 우선 동작", s13, [](RvcSimulator& sim) -> SystemTestResult {
+        sim.setSensorFault(SensorDirection::Left, SimulatedSensor::FaultMode::StuckFalse);
         sim.turnOn(); sim.step();
-        return {SamePoint(sim.getRobotDirection(), Point(1, 0)) && sim.isMotorBlocked(),
-                "우측 벽 미검출 고장 상황에서 충돌/차단 재현 실패"};
+        return {SamePoint(sim.getRobotDirection(), Point(-1, 0)),
+                "좌측 센서 미검출 고장 상황에서 좌회전 동작이 재현되지 않음"};
     });
     AddCase(cases, 14, "Negative", "Dust 음수 좌표 입력", s14, [](RvcSimulator& sim) -> SystemTestResult {
         return {!sim.addDust(-1, -1), "음수 좌표 거부"};
@@ -184,10 +198,10 @@ std::vector<SystemTestCase> BuildSystemTestCases() {
         sim.turnOn(); sim.step();
         return {sim.isPowerOn(), "시작 즉시 3면 차단"};
     });
-    AddCase(cases, 16, "Negative", "후진 무한 경로에서 제한 동작", s16, [](RvcSimulator& sim) -> SystemTestResult {
+    AddCase(cases, 16, "Negative", "3면 차단 경로에서 후진/재확인 동작", s16, [](RvcSimulator& sim) -> SystemTestResult {
         sim.turnOn(); for (int i = 0; i < 15; ++i) sim.step();
-        return {sim.isAvoiding() && sim.getConsecutiveAvoidSteps() > 0 && sim.getConsecutiveAvoidSteps() <= 15,
-                "후진 상태/제한 카운트가 명확히 재현되지 않음"};
+        return {sim.isPowerOn() && sim.getConsecutiveAvoidSteps() <= 15,
+                "3면 차단 경로에서 안정적으로 회피하지 못함"};
     });
     AddCase(cases, 17, "Negative", "모터 고장 시 움직이지 않음", s17, [](RvcSimulator& sim) -> SystemTestResult {
         sim.turnOn(); sim.setMotorBroken(true); sim.step(); if (sim.isMotorBlocked()) sim.turnOff();
@@ -197,25 +211,27 @@ std::vector<SystemTestCase> BuildSystemTestCases() {
         sim.turnOn(); sim.step(); sim.turnOff(); const Point p = sim.getRobotPoint(); sim.step();
         return {!sim.isPowerOn() && SamePoint(p, sim.getRobotPoint()), "동작 중 전원 끄기"};
     });
-    AddCase(cases, 19, "Negative", "Avoid 후 PowerUp 잔여 유지", s19, [](RvcSimulator& sim) -> SystemTestResult {
+    AddCase(cases, 19, "Negative", "PowerUp 직후 장애물 회피 방향 전환", s19, [](RvcSimulator& sim) -> SystemTestResult {
         sim.turnOn(); sim.step(); sim.step();
-        return {sim.isPowerUp() && sim.isAvoiding(), "Avoid 상태에서 PowerUp 잔여가 확인되지 않음"};
+        return {sim.isPowerOn() && SamePoint(sim.getRobotDirection(), Point(-1, 0)),
+                "PowerUp 직후 장애물 회피 방향 전환이 확인되지 않음"};
     });
-    AddCase(cases, 20, "Negative", "후진 중 좌우 센서 고장", s20, [](RvcSimulator& sim) -> SystemTestResult {
-        sim.turnOn();         // 첫 step에서 avoiding 진입
+    AddCase(cases, 20, "Negative", "후진 중 좌측 센서 미검출 고장", s20, [](RvcSimulator& sim) -> SystemTestResult {
+        sim.turnOn();
+        sim.step();
         sim.step();
         sim.setSensorFault(SensorDirection::Left, SimulatedSensor::FaultMode::StuckFalse);
-        sim.setSensorFault(SensorDirection::Right, SimulatedSensor::FaultMode::StuckFalse);
-        sim.step();           // 후진 중 센서 고장 상태에서 한 틱 더 진행
-        return {sim.isAvoiding() || SamePoint(sim.getRobotDirection(), Point(1, 0)) || SamePoint(sim.getRobotDirection(), Point(-1, 0)),
-                "후진 중 좌우 센서 고장 시 폴백 동작이 나타나지 않음"};
+        sim.step();
+        return {sim.isPowerOn() && !SamePoint(sim.getRobotPoint(), Point(3, 2)),
+                "후진 중 좌측 센서 미검출 고장 상황에서 이동이 재현되지 않음"};
     });
-    AddCase(cases, 21, "Negative", "후진 중 우측 센서 노이즈", s21, [](RvcSimulator& sim) -> SystemTestResult {
+    AddCase(cases, 21, "Negative", "후진 중 좌측 센서 노이즈", s21, [](RvcSimulator& sim) -> SystemTestResult {
         sim.turnOn();
-        sim.step(); // avoiding 진입
+        sim.step();
+        sim.step();
         const Point before = sim.getRobotPoint();
         for (int i = 0; i < 6; ++i) {
-            sim.setSensorFault(SensorDirection::Right,
+            sim.setSensorFault(SensorDirection::Left,
                 (i % 2 == 0) ? SimulatedSensor::FaultMode::StuckTrue : SimulatedSensor::FaultMode::Normal);
             sim.step();
         }

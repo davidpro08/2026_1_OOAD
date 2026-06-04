@@ -161,7 +161,7 @@ std::vector<SystemTestCase> BuildSystemTestCases() {
                 "우회전 후 열린 경로로 전진하지 않음"};
     });
     AddCase(cases, 8, "Positive", "우회전 후 전방 막힘 시 후진 진입", s8, [](RvcSimulator& sim) -> SystemTestResult {
-        sim.turnOn(); sim.step(); sim.step();
+        sim.turnOn(); sim.step(); sim.step(); sim.step(); sim.step(); sim.step();
         return {SamePoint(sim.getRobotPoint(), Point(3, 2)) && SamePoint(sim.getRobotDirection(), Point(0, 1)) && sim.isAvoiding(),
                 "우회전 후 전방 막힘 상황에서 후진 모드로 진입하지 않음"};
     });

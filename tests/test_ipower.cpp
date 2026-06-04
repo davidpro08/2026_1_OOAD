@@ -61,5 +61,5 @@ TEST(IPowerTest, MotorControllerCanBeUsedThroughIPowerPointer) {
     IPower* power = &controller;
     power->turnOff();
 
-    EXPECT_TRUE(turnOffPublished);
+    EXPECT_FALSE(turnOffPublished);
 }

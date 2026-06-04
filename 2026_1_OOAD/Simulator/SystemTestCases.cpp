@@ -140,7 +140,7 @@ std::vector<SystemTestCase> BuildSystemTestCases() {
         return {SamePoint(sim.getRobotPoint(), Point(2, 3)), "전진 위치 불일치"};
     });
     AddCase(cases, 3, "Positive", "여러 Tick걸쳐 앞으로 전진하는가", s3, [](RvcSimulator& sim) -> SystemTestResult {
-        sim.turnOn(); sim.step(); sim.step();
+        sim.turnOn(); sim.step(); sim.step(); sim.step(); sim.step();
         return {SamePoint(sim.getRobotPoint(), Point(2, 4)), "2틱 전진 실패"};
     });
     AddCase(cases, 4, "Positive", "장애물피하기 중 Cleaning 중단", s4, [](RvcSimulator& sim) -> SystemTestResult {

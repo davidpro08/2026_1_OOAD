@@ -14,10 +14,9 @@ const int DUST_THRESHOLD = 5;
 #include "SensorController.h"
 #include "ISensor.h"
 
-SensorController::SensorController(EventBus* bus, ISensor* leftSensor, ISensor* rightSensor, ISensor* dustSensor) {
+SensorController::SensorController(EventBus* bus, ISensor* leftSensor, ISensor* dustSensor) {
     this->bus = bus;
     this->leftSensor = leftSensor;
-    this->rightSensor = rightSensor;
     this->dustSensor = dustSensor;
     isTurnOn = false;
     doCheck = false;
@@ -45,10 +44,6 @@ void SensorController::FrontObstacleDetected() {
 
 bool SensorController::getLeftState() {
     return leftSensor->detect();
-}
-
-bool SensorController::getRightState() {
-    return rightSensor->detect();
 }
 
 void SensorController::ChecknPowerUp() {

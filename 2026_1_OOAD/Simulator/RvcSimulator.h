@@ -59,7 +59,6 @@ private:
     SimulatedMotor motor;
     SimulatedSensor frontSensor;
     SimulatedSensor leftSensor;
-    SimulatedSensor rightSensor;
     SimulatedSensor dustSensor;
     SimulatedCleaner cleaner;
     Timer cleanerTimer;

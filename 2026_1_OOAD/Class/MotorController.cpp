@@ -26,11 +26,15 @@ MotorController::MotorController(EventBus* bus, Motor& motor)
 void MotorController::turnOn() {
     isTurnOn = true;
     avoiding = false;
+    isBackward = false;
+    afterTurnRight = false;
 }
 
 void MotorController::turnOff() {
     isTurnOn = false;
     avoiding = false;
+    isBackward = false;
+    afterTurnRight = false;
     mySensor = nullptr;
 }
 
@@ -40,18 +44,23 @@ void MotorController::AvoidObstacle(SensorProvider& provider) {
         return;
 	}
 
-
-    if(provider.getRightState() == false) {
-        MCTurnRight();
-        avoiding = false;
-        bus->publishStartCleaning();
-    }else if(provider.getLeftState() == false){
+    if (afterTurnRight == true) {
+        MCTurnLeft();
+        avoiding = true;
+        isBackward = true;
+        afterTurnRight = false;
+    }else if (provider.getLeftState() == false) {
         MCTurnLeft();
         avoiding = false;
-        bus->publishStartCleaning();
-    }else{
-        avoiding = true;
-        // No exit yet: next tick should be another backward tick.
+        isBackward = false;
+        afterTurnRight = false;
+    }else {
+        if (isBackward == true) {
+            avoiding = true;
+            isBackward = false;
+        }
+        MCTurnRight();
+        afterTurnRight = true;
     }
 }
 void MotorController::MCStop() {
@@ -59,15 +68,23 @@ void MotorController::MCStop() {
 }
 
 void MotorController::MCMove() {
-    if(!avoiding) {
-        motor.moveForward();
+    if(isTurnOn == false) {
         return;
+    }
+
+    if(isBackward == false) {
+        if(afterTurnRight == true) {
+            avoiding = false;
+            isBackward = false;
+            afterTurnRight = false;
+        }
+        bus->publishStartCleaning();
+        motor.moveForward();
     }else{
+        MCMoveBackward();
         if (mySensor != nullptr) {
-            motor.moveBackward();
             bus->publishAvoidObstacle(mySensor);
         }
-        return;
     }
 }
 
@@ -84,5 +101,5 @@ void MotorController::MCMoveBackward() {
 }
 
 bool MotorController::isAvoiding() const {
-    return avoiding;
+    return avoiding && isBackward && !afterTurnRight;
 }
